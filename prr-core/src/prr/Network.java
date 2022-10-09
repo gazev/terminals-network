@@ -46,7 +46,7 @@ public class Network implements Serializable {
 		_clients.put(id, _client);
 	}
 
-	
+
 
 
 
@@ -77,8 +77,8 @@ public class Network implements Serializable {
 	 */
 	void importFile(String filename) throws UnrecognizedEntryException, IOException  {
 		BufferedReader reader = new BufferedReader(new FileReader(txtfile));
-		String linha;
-		while ((linha = reader.readLine()) != null) {
+		String linhaa;
+		while ((linhaa = reader.readLine()) != null) {
 			String[] fields = linha.split("\\|");
 			try {
 				registerFromFields(fields);
