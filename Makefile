@@ -1,4 +1,4 @@
-CLASSPATH := /usr/share/java/po-uilib.jar:./prr-app/prr-app.jar:./prr-core/prr-core.jar
+CLASSPATH :=./po-uilib/po-uilib.jar:./prr-app/prr-app.jar:./prr-core/prr-core.jar
 JARS := $(shell sed 's/\:/ /g' <<< $(CLASSPATH))
 
 .PHONY = all clean install run
