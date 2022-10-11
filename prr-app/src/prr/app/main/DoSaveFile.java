@@ -1,6 +1,12 @@
 package prr.app.main;
 
+import java.io.FileNotFoundException;
+import java.io.IOError;
+import java.io.IOException;
+
 import prr.NetworkManager;
+import prr.app.exceptions.FileOpenFailedException;
+import prr.exceptions.MissingFileAssociationException;
 import pt.tecnico.uilib.forms.Form;
 import pt.tecnico.uilib.menus.Command;
 //FIXME add more imports if needed
@@ -16,6 +22,18 @@ class DoSaveFile extends Command<NetworkManager> {
 
 	@Override
 	protected final void execute() {
-                //FIXME implement command and create a local Form
+		try {
+			_receiver.save();
+		} catch (MissingFileAssociationException e) {
+			try {
+				_receiver.saveAs(Form.requestString(Prompt.saveAs()));
+			} catch (MissingFileAssociationException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

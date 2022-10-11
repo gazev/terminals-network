@@ -1,4 +1,4 @@
-package prr.clients;
+package prr.communications;
 
 public abstract class Communication {
     
