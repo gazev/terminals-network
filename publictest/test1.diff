@@ -1,0 +1,42 @@
+*** publictest/test1.out	2022-10-13 15:42:17.267525600 +0100
+--- publictest/test1.outhyp	2022-10-13 16:10:01.427613900 +0100
+***************
+*** 1,3 ****
+! 2
+! 3
+! 0
+--- 1,34 ----
+! MENU PRINCIPAL
+! 1 - Abrir
+! 2 - Guardar
+! 3 - Gestão de clientes
+! 4 - Gestão de terminais
+! 5 - Menu de consultas
+! 6 - Ver saldo global
+! 0 - Sair
+! Escolha uma opção: GESTÃO DE CLIENTES
+! 1 - Visualizar cliente
+! 2 - Visualizar todos os clientes
+! 3 - Registar cliente
+! 4 - Activar notificações
+! 5 - Desactivar notificações
+! 6 - Mostrar saldo de cliente
+! 0 - Sair
+! Escolha uma opção: CLIENT|c1|Gonga|10
+! GESTÃO DE CLIENTES
+! 1 - Visualizar cliente
+! 2 - Visualizar todos os clientes
+! 3 - Registar cliente
+! 4 - Activar notificações
+! 5 - Desactivar notificações
+! 6 - Mostrar saldo de cliente
+! 0 - Sair
+! Escolha uma opção: MENU PRINCIPAL
+! 1 - Abrir
+! 2 - Guardar
+! 3 - Gestão de clientes
+! 4 - Gestão de terminais
+! 5 - Menu de consultas
+! 6 - Ver saldo global
+! 0 - Sair
+! Escolha uma opção: Fim de entrada de dados (R-EOF): pt.tecnico.uilib.text.RuntimeEOFException: Fim do fluxo de dados de entrada

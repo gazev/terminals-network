@@ -2,7 +2,8 @@
 
 echo "$0"
 
-for x in tests/*.in; do
+
+for x in $2/*.in; do
     if [ -e ${x%.in}.import ]; then
 	java -cp "$1" -Dimport=${x%.in}.import -Din=$x -Dout=${x%.in}.outhyp prr.app.App;
     else

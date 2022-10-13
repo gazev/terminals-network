@@ -1,7 +1,5 @@
 package prr.clients;
 
-import java.util.ArrayList;
-
-public interface NotificationMethod {
-    public void notify(ArrayList<Notification> notificationsLog);
+interface NotificationMethod {
+    public void deliverNotifications();
 }
