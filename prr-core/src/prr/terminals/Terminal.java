@@ -1,6 +1,11 @@
 package prr.terminals;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+
+import prr.clients.Client;
+import prr.communications.Communication;
 
 // FIXME add more import if needed (cannot import from pt.tecnico or prr.app)
 
@@ -12,7 +17,12 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 	/** Serial number for serialization. */
 	private static final long serialVersionUID = 202208091753L;
 
-        // FIXME define attributes
+        private Client _owner;
+        private List<Client> _clientObservers;
+        private Map<Integer, Communication> _communications;
+        private TerminalState _state;
+        private List<Terminal> _friends;
+
         // FIXME define contructor(s)
         // FIXME define methods
 

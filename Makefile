@@ -18,5 +18,8 @@ install:
 run:
 	java -cp $(CLASSPATH) prr.app.App
 
-test:
-	@./runtests.sh $(CLASSPATH)
+ptests:
+	@./runtests.sh $(CLASSPATH) publictest
+
+test: 
+	@./runtests.sh $(CLASSPATH) tests
