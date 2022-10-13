@@ -28,9 +28,6 @@ public class NetworkManager {
 	/** The name of the file associated with current Network instance */
 	private String _filename = "";
 
-	/** Signals if Network is dirty (has unsaved changes) */
-	private boolean _dirtyFlag = false;
-
 	/**
 	 * 
 	 * @return the current network instance
@@ -45,22 +42,6 @@ public class NetworkManager {
 	 */
 	public String getFilename() {
 		return _filename;
-	}
-
-	/**
-	 * 
-	 * @return returns true if current Network instance is dirty
-	 */
-	public boolean isDirty() {
-		return _dirtyFlag;
-	}
-
-	/**
-	 * 
-	 * @param dirtyFlag signals if current Network is dirty 
-	 */
-	public void setDirtyFlag(boolean dirtyFlag) {
-		_dirtyFlag = dirtyFlag;
 	}
 
 	public void setFilename(String filename) {
@@ -95,28 +76,20 @@ public class NetworkManager {
 	 * @throws IOException if there is some error while serializing the state of the network to disk.
 	 */
 	public void save() throws FileNotFoundException, MissingFileAssociationException, IOException {
-		/* If there are no changes, return */
-		if(!isDirty()) {
-			return;
-		}
-
 		/* No file associated with this instance of the Network */
-		if(getFilename().isBlank() || getFilename() == null)
+		if(getFilename() == null || getFilename().isBlank())
 			throw new MissingFileAssociationException();
 
 		/* Write Network object to file */
-		try {
+		if(_network.isDirty()) {
 			FileOutputStream f = new FileOutputStream(getFilename());
 			BufferedOutputStream b = new BufferedOutputStream(f);
 			ObjectOutput o = new ObjectOutputStream(b);
 			o.writeObject(_network);
 			o.close();
-		} catch(IOException e) {
-			throw new IOException();
+			/* After save, Network data is not dirty */
+			_network.setClean();
 		}
-		
-		/* After save, Network data is not dirty */
-		setDirtyFlag(false);
 	}
 
 	/**

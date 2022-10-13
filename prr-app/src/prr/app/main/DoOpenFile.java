@@ -1,9 +1,8 @@
 package prr.app.main;
 
-import java.io.IOError;
-
 import prr.NetworkManager;
 import prr.app.exceptions.FileOpenFailedException;
+import prr.exceptions.MissingFileAssociationException;
 import prr.exceptions.UnavailableFileException;
 import pt.tecnico.uilib.forms.Form;
 import pt.tecnico.uilib.menus.Command;
@@ -17,7 +16,9 @@ class DoOpenFile extends Command<NetworkManager> {
 
 	DoOpenFile(NetworkManager receiver) {
 		super(Label.OPEN_FILE, receiver);
-                addStringField("file", Prompt.openFile());
+                // prompt name of file
+                String f = Prompt.openFile();
+                addStringField("file", f);
 	}
 
 	@Override
@@ -26,8 +27,6 @@ class DoOpenFile extends Command<NetworkManager> {
                         _receiver.load(stringField("file"));
                 } catch (UnavailableFileException e) {
                         throw new FileOpenFailedException(e);
-                } catch(IOError e) {
-                        e.printStackTrace();
                 } 
 	}
 }

@@ -3,6 +3,7 @@ package prr.app.main;
 import java.io.FileNotFoundException;
 import java.io.IOError;
 import java.io.IOException;
+import java.util.MissingFormatArgumentException;
 
 import prr.NetworkManager;
 import prr.app.exceptions.FileOpenFailedException;
@@ -22,18 +23,24 @@ class DoSaveFile extends Command<NetworkManager> {
 
 	@Override
 	protected final void execute() {
+		// tries to save, if there is no file perform saveAs action
 		try {
-			_receiver.save();
-		} catch (MissingFileAssociationException e) {
 			try {
-				_receiver.saveAs(Form.requestString(Prompt.saveAs()));
-			} catch (MissingFileAssociationException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
+				_receiver.save();
+			} catch (MissingFileAssociationException e) {
+				saveAs();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+}
+
+	public void saveAs() throws IOException {
+		// prompts user for filename and save, if empty filename retry 
+		try {
+			_receiver.saveAs(Form.requestString(Prompt.newSaveAs()));
+		} catch (MissingFileAssociationException e) {
+			saveAs();
 		}
 	}
 }
