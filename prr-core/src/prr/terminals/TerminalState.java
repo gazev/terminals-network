@@ -1,5 +1,5 @@
 package prr.terminals;
 
-interface TerminalState {
+public interface TerminalState {
     // TODO
 }

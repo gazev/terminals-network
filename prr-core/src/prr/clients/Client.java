@@ -12,7 +12,7 @@ public class Client {
     String _name;
 
     /** Client's tax ID */
-    int _taxId;
+    int _taxID;
 
     /** Client's type */
     ClientType _type;
@@ -38,10 +38,10 @@ public class Client {
         // TODO
     }
     
-    public Client(String key, String name, int taxId) {
+    public Client(String key, String name, int taxID) {
         _key = key;
         _name = name;
-        _taxId = taxId;
+        _taxID = taxID;
         _type = new NormalType();
     }
 
@@ -53,8 +53,8 @@ public class Client {
         return _name;
     }
 
-    public int getTaxId() {
-        return _taxId;
+    public int getTaxID() {
+        return _taxID;
     }
 
     public boolean notificationsOn() {
@@ -104,7 +104,7 @@ public class Client {
         return "CLIENT|" + 
                 getKey() + "|" + 
                 getName() + "|" +
-                getTaxId() + "|" + 
+                getTaxID() + "|" + 
                 getClientType().toString() + "|" + 
                 (notificationsOn() ? "YES" : "NO") + "|" +
                 getClientDebt() + "|" +

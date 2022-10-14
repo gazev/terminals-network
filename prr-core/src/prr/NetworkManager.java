@@ -5,11 +5,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+import prr.exceptions.BadEntryException;
+import prr.exceptions.IllegalEntryException;
 import prr.exceptions.ImportFileException;
 import prr.exceptions.MissingFileAssociationException;
 import prr.exceptions.UnavailableFileException;
@@ -114,9 +115,9 @@ public class NetworkManager {
 	 */
 	public void importFile(String filename) throws ImportFileException {
 		try {
-                        _network.importFile(filename);
-                } catch (IOException | UnrecognizedEntryException /* FIXME maybe other exceptions */ e) {
-                        throw new ImportFileException(filename, e);
+            _network.importFile(filename);
+        } catch (IOException | UnrecognizedEntryException | BadEntryException | IllegalEntryException e) {
+            throw new ImportFileException(filename, e);
     }
 	}
 
