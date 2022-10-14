@@ -22,11 +22,11 @@ class DoRegisterClient extends Command<Network> {
 	protected final void execute() throws CommandException {
 		try {
 			_receiver.registerClient(
-								stringField("key"), 
-								stringField("name"), 
-								integerField("taxId"));
+							stringField("key"), 
+							stringField("name"), 
+							integerField("taxId"));
 		} catch(prr.exceptions.DuplicateClientKeyException e) {
-			throw new DuplicateClientKeyException(stringField("key"));
+			throw new DuplicateClientKeyException(e.getKey());
 		}
 	}
 

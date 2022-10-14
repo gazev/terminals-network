@@ -17,14 +17,45 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 	/** Serial number for serialization. */
 	private static final long serialVersionUID = 202208091753L;
 
+        /** Terminal identifying key */
+        private String _key;
+
+        /** Client that owns this Terminal */
         private Client _owner;
+
+        /** List of Clients that are awaiting this Terminal State update */
         private List<Client> _clientObservers;
+
+        /** List of communications started by this Terminal */
         private Map<Integer, Communication> _communications;
+
+        /** The current State of this Terminal */
         private TerminalState _state;
+
+        /** Terminal friends of this Terminal */
         private List<Terminal> _friends;
 
         // FIXME define contructor(s)
         // FIXME define methods
+
+
+        public Terminal(String key, Client owner) {
+            _key = key;
+            _owner = owner;
+            _state = new OnTerminalState();
+        }
+
+        public String getKey() {
+            return _key;
+        }
+
+        public TerminalState getTerminalState() {
+            return _state;
+        } 
+
+        public void setTerminalState(TerminalState state) {
+            _state = state;
+        }
 
         /**
          * Checks if this terminal can end the current interactive communication.
