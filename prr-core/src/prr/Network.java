@@ -18,6 +18,8 @@ import prr.exceptions.DuplicateTerminalKeyException;
 import prr.exceptions.IllegalEntryException;
 import prr.exceptions.ImportFileException;
 import prr.exceptions.InvalidTerminalKeyException;
+import prr.exceptions.UnknownClientKeyException;
+import prr.exceptions.UnknownTerminalKeyException;
 import prr.exceptions.UnrecognizedEntryException;
 import prr.terminals.TerminalState;
 import prr.terminals.BasicTerminal;
@@ -69,26 +71,60 @@ public class Network implements Serializable {
 		_dirtyFlag = false;
 	}
 
-    public Client getClientByKey(String key) {
-        return _clients.get(key);
+    /**
+     * 
+     * @param key
+     * @return
+     * @throws UnknownClientKeyException
+     */
+    public Client getClientByKey(String key) throws UnknownClientKeyException {
+        Client c = _clients.get(key);
+        if(c == null)
+            throw new UnknownClientKeyException(key);
+        return c;
     }
 
-    public Terminal getTerminalByKey(String key) {
-        return _terminals.get(key);
+    /**
+     * 
+     * @param key
+     * @return
+     * @throws UnknownTerminalKeyException
+     */
+    public Terminal getTerminalByKey(String key) throws UnknownTerminalKeyException {
+        Terminal t = _terminals.get(key);
+        if(t == null) 
+            throw new UnknownTerminalKeyException(key);
+        return t;
     }
 
+    /**
+     * 
+     * @return
+     */
 	public Collection<Client> getAllClients() {
 		return _clients.values();
 	}
 
+    /**
+     * 
+     * @return
+     */
     public Collection<Terminal> getAllTerminals() {
         return _terminals.values();
     }
 
+    /**
+     * 
+     * @param c
+     */
     public void addClient(Client c) {
         _clients.put(c.getKey(), c);
     }
 
+    /**
+     * 
+     * @param t
+     */
     public void addTerminal(Terminal t) {
         _terminals.put(t.getKey(), t);
     }
@@ -103,8 +139,8 @@ public class Network implements Serializable {
      * @throws DuplicateClientKeyException if a Client with given key already
      *                                     exists in the Network
      */
-	public void registerClient(String key, String name, Integer taxId) 
-	                                            throws DuplicateClientKeyException {
+	public void registerClient(String key, String name, Integer taxId) throws 
+                                                DuplicateClientKeyException {
 		if(_clients.containsKey(key))
 			throw new DuplicateClientKeyException(key);
         addClient(new Client(key, name, taxId));
@@ -115,20 +151,25 @@ public class Network implements Serializable {
      * @param ownerKey
      * @param state
      * 
-     * @throws InvalidTerminalKeyException
-     * @throws DuplicateTerminalKeyException
+     * @throws InvalidTerminalKeyException if given key is not a 6 digit string
+     * @throws DuplicateTerminalKeyException if a Terminal with given key already
+     *                                       exists in the Network
+     * @throws UnknownClientKeyException if a Client with given key doesn't exist
+     *                                   in the Network
      */
-    public void registerTerminal(String type, String key, String ownerKey) 
-                                                throws InvalidTerminalKeyException, 
-                                                    DuplicateTerminalKeyException {
+    public void registerTerminal(String key, String type, String ownerKey) throws 
+                                                InvalidTerminalKeyException, 
+                                                    DuplicateTerminalKeyException, 
+                                                        UnknownClientKeyException {
         // validate that key has only 6 digits (\d <=> [0,9] regex) 
         if(!key.matches("\\d{6}"))
             throw new InvalidTerminalKeyException(key);
 
         // check if Terminal with given key exists
-        if(getTerminalByKey(key) != null)
+        if(_terminals.containsKey(key))
             throw new DuplicateTerminalKeyException(key);
 
+        // add Terminal to the Network
         addTerminal(type.equals("BASIC") ?
             new BasicTerminal(key, getClientByKey(ownerKey)) :
                 new FancyTerminal(key, getClientByKey(ownerKey)));
@@ -148,8 +189,10 @@ public class Network implements Serializable {
      *                               integrity constraints
      * @throws IOException if there is an IO erro while processing the text file
 	 */
-	void importFile(String filename) throws UnrecognizedEntryException, IOException, 
-                                                BadEntryException, IllegalEntryException  {
+	void importFile(String filename) throws UnrecognizedEntryException, 
+                                                BadEntryException, 
+                                                    IllegalEntryException,
+                                                        IOException {
 		try {
 			FileReader f = new FileReader(filename);
 			BufferedReader b = new BufferedReader(f);
@@ -158,10 +201,9 @@ public class Network implements Serializable {
                 parseInputLine(inputLine);
 			b.close();
 		} catch (IOException e) {
+            // shouldn't happen
 			e.printStackTrace();;
-		} catch(UnrecognizedEntryException e) {
-            throw new UnrecognizedEntryException(e.getEntrySpecification());
-        }
+		}
     }
 
 	/**
@@ -174,19 +216,17 @@ public class Network implements Serializable {
      * @throws IllegalEntryException if imported entity violates Network 
      *                               integrity constraints
 	 */
-	public void parseInputLine(String inputLine) throws UnrecognizedEntryException, 
-                                                        BadEntryException, IllegalEntryException {
+	public void parseInputLine(String inputLine) throws 
+                                                UnrecognizedEntryException, 
+                                                    BadEntryException, 
+                                                        IllegalEntryException {
 		String[] fields = inputLine.split("\\|");
-        try {
-		    switch (fields[0]) {
-			case "CLIENT"         -> importClient(fields);
+        switch (fields[0]) {
+            case "CLIENT"         -> importClient(fields);
             case "BASIC", "FANCY" -> importTerminal(fields);
-			case "FRIENDS"        -> importFriends(fields);
-			default -> 
-                throw new UnrecognizedEntryException(fields[0]);
-            }
-        } catch (UnrecognizedEntryException e) {
-            throw new UnrecognizedEntryException(fields[0]);
+            case "FRIENDS"        -> importFriends(fields);
+            default -> 
+               throw new UnrecognizedEntryException(fields[0]);
         }
 	}
 
@@ -194,7 +234,7 @@ public class Network implements Serializable {
      * Parses and imports a Client entity.
      * <p>
      * Format of Client entity input:
-     * {@code CLIENT|id|name|taxID}
+     * {@code CLIENT|key|name|taxID}
      * 
      * @param fields An array with each field for the Client entity
      * 
@@ -202,7 +242,8 @@ public class Network implements Serializable {
      *                           of fields for Client
      * @throws IllegalEntryException if Client key is duplicate
      */
-    public void importClient(String[] fields) throws BadEntryException, IllegalEntryException {
+    public void importClient(String[] fields) throws BadEntryException, 
+                                            IllegalEntryException {
         // check for correct number of fields for Client 
         if(fields.length != 4)
             throw new BadEntryException(String.join("|", fields));
@@ -210,7 +251,7 @@ public class Network implements Serializable {
         try {
             registerClient(fields[1], fields[2], Integer.parseInt(fields[3]));
         } catch (DuplicateClientKeyException e) {
-            throw new IllegalEntryException(e.getKey());
+            throw new IllegalEntryException(fields[1]);
         }
     }
 
@@ -218,18 +259,20 @@ public class Network implements Serializable {
      * Parses and imports a Terminal entity.
      * <p>
      * Format of Terminal entity input:
-     * {@code terminal-type|idTerminal|idOwner|state}
+     * {@code terminal-type|terminal-key|owner-key|state}
      * 
      * @param fields An array with each field for the Terminal entity
      * 
      * @throws BadEntryException
      * @throws IllegalEntryException if entry has values that do not respect the Network
-     *                               integrity
+     *                               integrity constraints
      * @throws BanEntryException if the entry doesn't have the correct fields
      *                           for Terminal 
      */
-    public void importTerminal(String[] fields) throws UnrecognizedEntryException, 
-                                                BadEntryException, IllegalEntryException {
+    public void importTerminal(String[] fields) throws 
+                                            UnrecognizedEntryException, 
+                                                BadEntryException, 
+                                                    IllegalEntryException {
         // check for BadEntryException
         if(fields.length != 4)
             throw new BadEntryException(String.join("|", fields));
@@ -245,16 +288,42 @@ public class Network implements Serializable {
         };
 
         try {
-            registerTerminal(fields[0], fields[1], fields[2]);
-        } catch (InvalidTerminalKeyException | DuplicateTerminalKeyException e) {
-            throw new IllegalEntryException(fields[1]);
+            registerTerminal(fields[1], fields[0], fields[2]);
+        } catch (InvalidTerminalKeyException 
+                | DuplicateTerminalKeyException 
+                | UnknownClientKeyException e) {
+            throw new IllegalEntryException(String.join("|", fields));
         } finally {
-            getTerminalByKey(fields[1]).setTerminalState(state);
+            // set TerminalState
+            try {
+                getTerminalByKey(fields[1]).setTerminalState(state);
+            } catch(UnknownTerminalKeyException e) {
+                // this should never happen
+            }
         }
     }
 
-    public void importFriends(String[] fields) {
-        // TODO
+    /**
+     * Parses and imports a list of friends of a Terminal
+     * <p>
+     * Entry format:
+     * {@code FRIENDS|terminal-key|friend1-key,friend2-key...friendN-key}
+     * @param fields
+     */
+    public void importFriends(String[] fields) throws BadEntryException,
+                                                    IllegalEntryException {
+        if(fields.length != 3)
+            throw new BadEntryException(String.join("|", fields));
+
+        String[] friends = fields[3].split(",");
+        // add all friends to terminal
+        try {
+            Terminal t = getTerminalByKey(fields[1]);
+            for(String s : friends)
+                t.addFriend(getTerminalByKey(s));
+        } catch (UnknownTerminalKeyException e) {
+            throw new IllegalEntryException(e.getKey());
+        }
     }
 }
 

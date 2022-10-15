@@ -6,6 +6,7 @@ import prr.app.exceptions.InvalidTerminalKeyException;
 import prr.app.exceptions.UnknownClientKeyException;
 import pt.tecnico.uilib.menus.Command;
 import pt.tecnico.uilib.menus.CommandException;
+import pt.tecnico.uilib.forms.Form;
 //FIXME add more imports if needed
 
 /**
@@ -15,11 +16,22 @@ class DoRegisterTerminal extends Command<Network> {
 
 	DoRegisterTerminal(Network receiver) {
 		super(Label.REGISTER_TERMINAL, receiver);
-		//FIXME add command fields
+        addStringField("key", Prompt.terminalKey());
+        addStringField("type", Prompt.terminalType());
+        addStringField("owner", Prompt.clientKey());
 	}
 
 	@Override
 	protected final void execute() throws CommandException {
-                //FIXME implement command
+        try {
+            _receiver.registerTerminal(stringField("key"), stringField("type"), 
+            stringField("owner"));
+        } catch (prr.exceptions.DuplicateTerminalKeyException e) {
+            throw new DuplicateTerminalKeyException(e.getKey());
+        } catch (prr.exceptions.InvalidTerminalKeyException e) {
+            throw new InvalidTerminalKeyException(e.getKey());
+        } catch (prr.exceptions.UnknownClientKeyException e) {
+            throw new UnknownClientKeyException(e.getKey());
+        }
 	}
 }
