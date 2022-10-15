@@ -7,5 +7,8 @@ public class FancyTerminal extends BasicTerminal {
         super(key, owner);
     }
 
+    public String toString() {
+        return "FANCY|" + super.toString();
+    }
     
 }

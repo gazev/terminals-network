@@ -3,6 +3,7 @@ package prr.terminals;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import prr.clients.Client;
 import prr.communications.Communication;
@@ -33,7 +34,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         private TerminalState _state;
 
         /** Terminal friends of this Terminal */
-        private List<Terminal> _friends;
+        private Map<String, Terminal> _friends = new TreeMap<>();
 
         // FIXME define contructor(s)
         // FIXME define methods
@@ -47,6 +48,30 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         public String getKey() {
             return _key;
+        }
+
+        public Client getOwner() {
+            return _owner;
+        }
+
+        public Integer getPaid() {
+            return 0;
+        }
+
+        public Integer getDebt() {
+            return 0;
+        }
+
+        public Integer getBalance() {
+            return 0;
+        }
+
+        public TerminalState getState() {
+            return _state;
+        }
+
+        public void addFriend(Terminal t) {
+            _friends.put(t.getKey(), t);
         }
 
         public TerminalState getTerminalState() {
@@ -74,5 +99,15 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          **/
         public boolean canStartCommunication() {
         	return true;
+        }
+
+        @Override
+        public String toString() {
+            return 
+                getKey() + "|" +
+                getOwner().getKey() + "|" + 
+                getState() + "|" +
+                getPaid() + "|" +
+                getDebt();
         }
 }
