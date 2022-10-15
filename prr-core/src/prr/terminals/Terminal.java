@@ -1,8 +1,11 @@
 package prr.terminals;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import prr.clients.Client;
@@ -70,6 +73,10 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             return _state;
         }
 
+        /**
+         * 
+         * @param t
+         */
         public void addFriend(Terminal t) {
             _friends.put(t.getKey(), t);
         }
@@ -101,13 +108,31 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         	return true;
         }
 
+        /**
+         * Returns string that represents this Terminal
+         * <p>
+         * Formats:
+         * {@code terminal-key|owner-key|state|debt|paid}
+         * {@code terminal-key|owner-key|state|debt|paid|friend1,friend2,...,friendN}
+         * 
+         * @see java.lang.Object#toString()
+         */
         @Override
         public String toString() {
+            Set<String> friendSet;
+            String friendsString = "";
+            // if Terminal has friends, compose a string with friend's keys
+            if(!_friends.isEmpty()) {
+                friendSet = _friends.keySet();
+                friendsString = String.join(",", friendSet);
+            }
+
             return 
                 getKey() + "|" +
                 getOwner().getKey() + "|" + 
                 getState() + "|" +
                 getPaid() + "|" +
-                getDebt();
+                getDebt() + 
+                (friendsString.isEmpty() ? "" : "|" + friendsString);
         }
 }

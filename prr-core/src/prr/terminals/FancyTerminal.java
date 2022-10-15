@@ -8,7 +8,6 @@ public class FancyTerminal extends BasicTerminal {
     }
 
     public String toString() {
-        return "FANCY|" + super.toString();
+        return super.toString().replace("BASIC", "FANCY");
     }
-    
 }

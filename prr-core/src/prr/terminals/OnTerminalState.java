@@ -1,6 +1,12 @@
 package prr.terminals;
 
-public class OnTerminalState implements TerminalState {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class OnTerminalState implements TerminalState, Serializable {
+    @Serial
+    /** Serial number for serialization. */
+	private static final long serialVersionUID = 202208091753L;
     // TODO
 
     @Override

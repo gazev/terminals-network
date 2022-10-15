@@ -1,10 +1,19 @@
 package prr.clients;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 import prr.terminals.Terminal;
 
-public class Client {
+public class Client implements Serializable {
+
+    @Serial
+    /** Serial number for serialization. */
+	private static final long serialVersionUID = 202208091753L;
+
     /** Client's key */
     String _key;
 
@@ -17,6 +26,8 @@ public class Client {
     /** Client's type */
     ClientType _type;
 
+    Map<String, Terminal> _terminals = new TreeMap<>();
+
     /** Client's notifications not yet delivered */
     ArrayList<Notification> _notificationsLog = new ArrayList<>();
 
@@ -25,6 +36,11 @@ public class Client {
 
     /** Notification method, initialized with default NotificationMethod */
     NotificationMethod _notificationMethod = new NotificationMethod() {
+
+        @Serial
+        /** Serial number for serialization. */
+	    private static final long serialVersionUID = 202208091753L;
+
         /** The default Notification Method does not perform any relevant action as Notifications 
          * are delivered through the Client's Menu 
          */
@@ -65,17 +81,16 @@ public class Client {
         return _type;
     }
     
+    public Integer getNumberOfTerminals() {
+        return _terminals.size();
+    }
+
     public Integer getClientDebt() {
         return 0;
         // TODO
     }
 
     public Integer getClientPaid() {
-        return 0;
-        // TODO
-    }
-
-    public Integer getClientBalance() {
         return 0;
         // TODO
     }
@@ -107,8 +122,8 @@ public class Client {
                 getTaxID() + "|" + 
                 getClientType().toString() + "|" + 
                 (notificationsOn() ? "YES" : "NO") + "|" +
+                getNumberOfTerminals() + "|" + 
                 getClientDebt() + "|" +
-                getClientPaid() + "|" +
-                getClientBalance();
+                getClientPaid(); 
     }
 }
