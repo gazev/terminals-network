@@ -72,10 +72,13 @@ public class Network implements Serializable {
 	}
 
     /**
+     * Returns Client with given key
      * 
-     * @param key
-     * @return
-     * @throws UnknownClientKeyException
+     * @param key Client's key
+     * @return Client with given key
+     * 
+     * @throws UnknownClientKeyException if Client with specified key doesn't 
+     *                                   exist in the Network
      */
     public Client getClientByKey(String key) throws UnknownClientKeyException {
         Client c = _clients.get(key);
@@ -85,10 +88,13 @@ public class Network implements Serializable {
     }
 
     /**
+     * Returns Terminal with given key
      * 
-     * @param key
-     * @return
-     * @throws UnknownTerminalKeyException
+     * @param key Terminal's key
+     * @return Terminal with specified key
+     * 
+     * @throws UnknownTerminalKeyException if Terminal with specified key doesn't
+     *                                     exist in the Network
      */
     public Terminal getTerminalByKey(String key) throws UnknownTerminalKeyException {
         Terminal t = _terminals.get(key);
@@ -98,35 +104,196 @@ public class Network implements Serializable {
     }
 
     /**
+     * Returns a Collection with all Clients registered in the Network
      * 
-     * @return
+     * @return Collection of all Clients
      */
 	public Collection<Client> getAllClients() {
 		return _clients.values();
 	}
 
     /**
+     * Returns a Collection with all Terminals registered in the Network
      * 
-     * @return
+     * @return Collection of all Terminals
      */
     public Collection<Terminal> getAllTerminals() {
         return _terminals.values();
     }
 
     /**
+     * Adds given Client to the Network
      * 
-     * @param c
+     * @param client to be added to the Network
      */
-    public void addClient(Client c) {
-        _clients.put(c.getKey(), c);
+    public void addClient(Client client) {
+        _clients.put(client.getKey(), client);
+        setDirty();
     }
 
     /**
+     * Add given Terminal to the Network
      * 
-     * @param t
+     * @param terminal to be added to the Network
      */
-    public void addTerminal(Terminal t) {
-        _terminals.put(t.getKey(), t);
+    public void addTerminal(Terminal terminal) {
+        _terminals.put(terminal.getKey(), terminal);
+        setDirty();
+    }
+
+
+
+
+	/**
+	 * Read text input file and create corresponding domain entities.
+	 *
+	 * @param filename name of the text input file
+     * 
+	 * @throws UnrecognizedEntryException if a specified entity doesn't exist 
+     *                                    or isn't recognized by the program 
+     * @throws BadEntryException if entry doesn't provide the correct fields for 
+     *                           an entity
+     * @throws IllegalEntryException if imported entity violates Network 
+     *                               integrity constraints
+     * @throws IOException if there is an IO erro while processing the text file
+	 */
+	void importFile(String filename) throws UnrecognizedEntryException, 
+                                                BadEntryException, 
+                                                    IllegalEntryException,
+                                                        IOException {
+		try {
+			FileReader f = new FileReader(filename);
+			BufferedReader b = new BufferedReader(f);
+            String inputLine;
+            while((inputLine = b.readLine()) != null) 
+                parseInputLine(inputLine);
+			b.close();
+		} catch (IOException e) {
+			e.printStackTrace();;
+		}
+    }
+
+	/**
+	 * @param inputLine line to be parsed
+     * 
+     * @throws UnrecognizedEntryException if a specified entity doesn't exist 
+     *                                    or isn't recognized by the program 
+     * @throws BadEntryException if entry doesn't provide the correct fields for 
+     *                           an entity
+     * @throws IllegalEntryException if imported entity violates Network 
+     *                               integrity constraints
+	 */
+	public void parseInputLine(String inputLine) throws 
+                                                UnrecognizedEntryException, 
+                                                    BadEntryException, 
+                                                        IllegalEntryException {
+		String[] fields = inputLine.split("\\|");
+        switch (fields[0]) {
+            case "CLIENT"         -> importClient(fields);
+            case "BASIC", "FANCY" -> importTerminal(fields);
+            case "FRIENDS"        -> importFriends(fields);
+            default -> 
+               throw new UnrecognizedEntryException(fields[0]);
+        }
+	}
+
+    /**
+     * Parses and imports a Client entity.
+     * <p>
+     * Format of Client entity input:
+     * {@code CLIENT|key|name|taxID}
+     * 
+     * @param fields An array with each field required to import a Client
+     * 
+     * @throws BadEntryException if the entry doesn't have the correct number 
+     *                           of fields for Client
+     * @throws IllegalEntryException if Client key is duplicate
+     */
+    public void importClient(String[] fields) throws BadEntryException, 
+                                            IllegalEntryException {
+        // check for correct number of fields for Client 
+        if(fields.length != 4)
+            throw new BadEntryException(String.join("|", fields));
+
+        try {
+            registerClient(fields[1], fields[2], Integer.parseInt(fields[3]));
+        } catch (DuplicateClientKeyException e) {
+            throw new IllegalEntryException(fields[1]);
+        }
+    }
+
+    /**
+     * Parses and imports a Terminal entity.
+     * <p>
+     * Format of Terminal entity input:
+     * {@code terminal-type|terminal-key|owner-key|state}
+     * 
+     * @param fields An array with each field required to import a Terminal
+     * 
+     * @throws UnrecognizedEntryException if a specified entity doesn't exist 
+     *                                    or isn't recognized by the program
+     * @throws BadEntryException if the entry doesn't have the correct fields
+     *                           for Terminal 
+     * @throws IllegalEntryException if entry has a field that does not respect 
+     *                               the Network's integrity constraints
+     */
+    public void importTerminal(String[] fields) throws 
+                                            UnrecognizedEntryException, 
+                                                BadEntryException, 
+                                                    IllegalEntryException {
+        // check for BadEntryException
+        if(fields.length != 4)
+            throw new BadEntryException(String.join("|", fields));
+        
+        // determine the terminal type
+        TerminalState state = switch(fields[3]) {
+        case "ON"     -> new OnTerminalState();
+        case "SILENT" -> new SilentTerminalState();
+        case "BUSY"   -> new BusyTerminalState();
+        case "OFF"    -> new OffTerminalState();
+        default -> 
+            throw new UnrecognizedEntryException(fields[3]);
+        };
+
+        try {
+            registerTerminal(fields[1], fields[0], fields[2]);
+        } catch (InvalidTerminalKeyException 
+                | DuplicateTerminalKeyException 
+                | UnknownClientKeyException e) {
+            throw new IllegalEntryException(String.join("|", fields));
+        } finally {
+            // set TerminalState
+            try {
+                getTerminalByKey(fields[1]).setTerminalState(state);
+            } catch(UnknownTerminalKeyException e) {
+                // this should never happen
+                throw new IllegalEntryException(e.getKey());
+            }
+        }
+    }
+
+    /**
+     * Parses and imports a list of friends of a Terminal
+     * <p>
+     * Entry format:
+     * {@code FRIENDS|terminal-key|friend1-key,friend2-key...friendN-key}
+     * 
+     * @param fields
+     */
+    public void importFriends(String[] fields) throws BadEntryException,
+                                                    IllegalEntryException {
+        if(fields.length != 3)
+            throw new BadEntryException(String.join("|", fields));
+
+        String[] friends = fields[2].split(",");
+        // add all friends to terminal
+        try {
+            Terminal t = getTerminalByKey(fields[1]);
+            for(String s : friends)
+                t.addFriend(getTerminalByKey(s));
+        } catch (UnknownTerminalKeyException e) {
+            throw new IllegalEntryException(e.getKey());
+        }
     }
 
     /**
@@ -174,156 +341,4 @@ public class Network implements Serializable {
             new BasicTerminal(key, getClientByKey(ownerKey)) :
                 new FancyTerminal(key, getClientByKey(ownerKey)));
     }
-
-
-	/**
-	 * Read text input file and create corresponding domain entities.
-	 *
-	 * @param filename name of the text input file
-     * 
-	 * @throws UnrecognizedEntryException if a specified entity doesn't exist 
-     *                                    or isn't recognized by the program 
-     * @throws BadEntryException if entry doesn't provide the correct fields for 
-     *                           an entity
-     * @throws IllegalEntryException if imported entity violates Network 
-     *                               integrity constraints
-     * @throws IOException if there is an IO erro while processing the text file
-	 */
-	void importFile(String filename) throws UnrecognizedEntryException, 
-                                                BadEntryException, 
-                                                    IllegalEntryException,
-                                                        IOException {
-		try {
-			FileReader f = new FileReader(filename);
-			BufferedReader b = new BufferedReader(f);
-            String inputLine;
-            while((inputLine = b.readLine()) != null) 
-                parseInputLine(inputLine);
-			b.close();
-		} catch (IOException e) {
-            // shouldn't happen
-			e.printStackTrace();;
-		}
-    }
-
-	/**
-	 * @param inputLine line to be parsed
-     * 
-     * @throws UnrecognizedEntryException if a specified entity doesn't exist 
-     *                                    or isn't recognized by the program 
-     * @throws BadEntryException if entry doesn't provide the correct fields for 
-     *                           an entity
-     * @throws IllegalEntryException if imported entity violates Network 
-     *                               integrity constraints
-	 */
-	public void parseInputLine(String inputLine) throws 
-                                                UnrecognizedEntryException, 
-                                                    BadEntryException, 
-                                                        IllegalEntryException {
-		String[] fields = inputLine.split("\\|");
-        switch (fields[0]) {
-            case "CLIENT"         -> importClient(fields);
-            case "BASIC", "FANCY" -> importTerminal(fields);
-            case "FRIENDS"        -> importFriends(fields);
-            default -> 
-               throw new UnrecognizedEntryException(fields[0]);
-        }
-	}
-
-    /**
-     * Parses and imports a Client entity.
-     * <p>
-     * Format of Client entity input:
-     * {@code CLIENT|key|name|taxID}
-     * 
-     * @param fields An array with each field for the Client entity
-     * 
-     * @throws BadEntryException if the entry doesn't have the correct number 
-     *                           of fields for Client
-     * @throws IllegalEntryException if Client key is duplicate
-     */
-    public void importClient(String[] fields) throws BadEntryException, 
-                                            IllegalEntryException {
-        // check for correct number of fields for Client 
-        if(fields.length != 4)
-            throw new BadEntryException(String.join("|", fields));
-
-        try {
-            registerClient(fields[1], fields[2], Integer.parseInt(fields[3]));
-        } catch (DuplicateClientKeyException e) {
-            throw new IllegalEntryException(fields[1]);
-        }
-    }
-
-    /**
-     * Parses and imports a Terminal entity.
-     * <p>
-     * Format of Terminal entity input:
-     * {@code terminal-type|terminal-key|owner-key|state}
-     * 
-     * @param fields An array with each field for the Terminal entity
-     * 
-     * @throws BadEntryException
-     * @throws IllegalEntryException if entry has values that do not respect the Network
-     *                               integrity constraints
-     * @throws BanEntryException if the entry doesn't have the correct fields
-     *                           for Terminal 
-     */
-    public void importTerminal(String[] fields) throws 
-                                            UnrecognizedEntryException, 
-                                                BadEntryException, 
-                                                    IllegalEntryException {
-        // check for BadEntryException
-        if(fields.length != 4)
-            throw new BadEntryException(String.join("|", fields));
-        
-        // determine the terminal type
-        TerminalState state = switch(fields[3]) {
-        case "ON"     -> new OnTerminalState();
-        case "SILENT" -> new SilentTerminalState();
-        case "BUSY"   -> new BusyTerminalState();
-        case "OFF"    -> new OffTerminalState();
-        default -> 
-            throw new UnrecognizedEntryException(fields[3]);
-        };
-
-        try {
-            registerTerminal(fields[1], fields[0], fields[2]);
-        } catch (InvalidTerminalKeyException 
-                | DuplicateTerminalKeyException 
-                | UnknownClientKeyException e) {
-            throw new IllegalEntryException(String.join("|", fields));
-        } finally {
-            // set TerminalState
-            try {
-                getTerminalByKey(fields[1]).setTerminalState(state);
-            } catch(UnknownTerminalKeyException e) {
-                // this should never happen
-            }
-        }
-    }
-
-    /**
-     * Parses and imports a list of friends of a Terminal
-     * <p>
-     * Entry format:
-     * {@code FRIENDS|terminal-key|friend1-key,friend2-key...friendN-key}
-     * @param fields
-     */
-    public void importFriends(String[] fields) throws BadEntryException,
-                                                    IllegalEntryException {
-        if(fields.length != 3)
-            throw new BadEntryException(String.join("|", fields));
-
-        String[] friends = fields[3].split(",");
-        // add all friends to terminal
-        try {
-            Terminal t = getTerminalByKey(fields[1]);
-            for(String s : friends)
-                t.addFriend(getTerminalByKey(s));
-        } catch (UnknownTerminalKeyException e) {
-            throw new IllegalEntryException(e.getKey());
-        }
-    }
 }
-
