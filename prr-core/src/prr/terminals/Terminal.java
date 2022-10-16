@@ -27,6 +27,9 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         /** Client that owns this Terminal */
         private Client _owner;
 
+        /** Current ongoing communication */
+        private Communication _activeCommunication;
+
         /** List of Clients that are awaiting this Terminal State update */
         private List<Client> _clientObservers;
 
@@ -53,6 +56,10 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             return _key;
         }
 
+        public Communication getActiveCommunication() {
+            return _activeCommunication;
+        }
+
         public Client getOwner() {
             return _owner;
         }
@@ -71,6 +78,16 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         public TerminalState getState() {
             return _state;
+        }
+
+        public boolean isOn() {
+            if(_state instanceof OnTerminalState)
+                return true;
+            return false;
+        }
+
+        public boolean isOff() {
+            return _state instanceof OffTerminalState;
         }
 
         /**
@@ -96,7 +113,9 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          *          it was the originator of this communication.
          **/
         public boolean canEndCurrentCommunication() {
-        	return true;
+            if(getActiveCommunication() != null)
+        	    return true;
+            return false;
         }
 
         /**
@@ -105,7 +124,9 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * @return true if this terminal is neither off neither busy, false otherwise.
          **/
         public boolean canStartCommunication() {
-        	return true;
+            if(!isOff() && (getActiveCommunication() == null))
+                return true;
+            return false;
         }
 
         /**
