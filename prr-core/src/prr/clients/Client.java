@@ -110,8 +110,12 @@ public class Client implements Serializable {
         _notificationMethod.notify();
     }
 
+    /**
+     * Adds given Terminal to the Client's Terminals 
+     * @param t
+     */
     public void addTerminal(Terminal t) {
-        // TODO
+        _terminals.put(t.getKey(), t);
     }
 
     @Override

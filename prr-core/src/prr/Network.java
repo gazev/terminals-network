@@ -138,6 +138,7 @@ public class Network implements Serializable {
      */
     public void addTerminal(Terminal terminal) {
         _terminals.put(terminal.getKey(), terminal);
+        terminal.getOwner().addTerminal(terminal);
         setDirty();
     }
 
