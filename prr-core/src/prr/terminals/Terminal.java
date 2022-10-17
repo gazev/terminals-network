@@ -58,13 +58,13 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         /**
          * Returns Terminal's currently active Communication
-         *  
+         *
          * @return Current active Communication
-         * 
+         *
          * @throws NoActiveCommunication if there is not active communication
          */
         public Communication getActiveCommunication() throws NoActiveCommunication {
-            // terminal doesn't have an active communication 
+            // terminal doesn't have an active communication
             if(_activeCommunication == null)
                 throw new NoActiveCommunication();
 
@@ -88,8 +88,8 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         }
 
         /**
-         * Adds given Terminal to Terminal's friend list 
-         * 
+         * Adds given Terminal to Terminal's friend list
+         *
          * @param t Terminal to be added to the Friend's list
          */
         public void addFriend(Terminal terminal) {
@@ -97,9 +97,9 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         }
 
         /**
-         * 
-         * @param key Terminal's key 
-         * 
+         *
+         * @param key Terminal's key
+         *
          * @return true if Terminal with given key is friends with
          *         given Terminal
          */
@@ -109,7 +109,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         public TerminalState getTerminalState() {
             return _state;
-        } 
+        }
 
         public void setTerminalState(TerminalState state) {
             _state = state;
@@ -142,7 +142,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * {@code terminal-key|owner-key|state|debt|paid}
          * <p>
          * {@code terminal-key|owner-key|state|debt|paid|friend1,friend2,...,friendN}
-         * 
+         *
          * @see java.lang.Terminal#toString()
          */
         @Override
@@ -155,12 +155,12 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 friendsString = String.join(",", friendSet);
             }
 
-            return 
+            return
                 getKey() + "|" +
-                getOwner().getKey() + "|" + 
+                getOwner().getKey() + "|" +
                 getState() + "|" +
-                getPaid() + "|" +
-                getDebt() + 
+                getPaidBalance() + "|" +
+                getDebtBalance() +
                 (friendsString.isEmpty() ? "" : "|" + friendsString);
         }
 }

@@ -13,7 +13,7 @@ install:
 run:
 	java -cp $(CLASSPATH) prr.app.App
 
-test: 
+test:
 	@./runtests.sh $(CLASSPATH) tests
 
 docs:
