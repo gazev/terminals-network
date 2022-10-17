@@ -60,7 +60,6 @@ public class NetworkManager {
 		try {
 			FileInputStream f = new FileInputStream(filename);
 			ObjectInputStream o = new ObjectInputStream(f);
-			// load saved network object into _network 
 			_network = (Network) o.readObject();
 			o.close();
 		} catch(IOException | ClassNotFoundException e) {
@@ -70,14 +69,14 @@ public class NetworkManager {
 	}
 
 	/**
-         * Saves the serialized application's state into the file associated to the current network.
-         *
+     * Saves the serialized application's state into the file associated to the current network.
+     *
 	 * @throws FileNotFoundException if for some reason the file cannot be created or opened. 
 	 * @throws MissingFileAssociationException if the current network does not have a file.
 	 * @throws IOException if there is some error while serializing the state of the network to disk.
 	 */
 	public void save() throws FileNotFoundException, MissingFileAssociationException, IOException {
-		/* No file associated with this instance of the Network */
+		/* No file associated with this instance of the application */
 		if(getFilename() == null || getFilename().isBlank())
 			throw new MissingFileAssociationException();
 
@@ -94,10 +93,11 @@ public class NetworkManager {
 	}
 
 	/**
-         * Saves the serialized application's state into the specified file. The current network is
-         * associated to this file.
-         *
+     * Saves the serialized application's state into the specified file. The current network is
+     * associated to this file.
+     *
 	 * @param filename the name of the file.
+	 * 
 	 * @throws FileNotFoundException if for some reason the file cannot be created or opened.
 	 * @throws MissingFileAssociationException if the current network does not have a file.
 	 * @throws IOException if there is some error while serializing the state of the network to disk.
@@ -108,17 +108,21 @@ public class NetworkManager {
 	}
 
 	/**
-	 * Read text input file and create domain entities..
+	 * Read text input file and create domain entities
 	 * 
 	 * @param filename name of the text input file
-	 * @throws ImportFileException
+	 * 
+	 * @throws ImportFileException if there are problems with input entries
+	 *                             e.g (unknown entity specified, wrong types for
+	 *                             a specific entity or entries that violate
+	 *                             Network's integrity contraints) 
 	 */
 	public void importFile(String filename) throws ImportFileException {
 		try {
             _network.importFile(filename);
         } catch (IOException | UnrecognizedEntryException | BadEntryException | IllegalEntryException e) {
             throw new ImportFileException(filename, e);
-    }
+    	}
 	}
 
 }

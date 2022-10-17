@@ -21,7 +21,7 @@ public class Client implements Serializable {
     String _name;
 
     /** Client's tax ID */
-    int _taxID;
+    int _taxId;
 
     /** Client's type */
     ClientType _type;
@@ -41,11 +41,11 @@ public class Client implements Serializable {
         /** Serial number for serialization. */
 	    private static final long serialVersionUID = 202208091753L;
 
-        /** The default Notification Method does not perform any relevant action as Notifications 
+        /** The default Notification Method currently does not perform any relevant action as Notifications 
          * are delivered through the Client's Menu 
          */
         public void deliverNotifications() {
-            // EMPTY
+            // EMPTY (for now)
         }
     }; 
 
@@ -54,10 +54,10 @@ public class Client implements Serializable {
         // TODO
     }
     
-    public Client(String key, String name, int taxID) {
+    public Client(String key, String name, int taxId) {
         _key = key;
         _name = name;
-        _taxID = taxID;
+        _taxId = taxId;
         _type = new NormalType();
     }
 
@@ -69,8 +69,8 @@ public class Client implements Serializable {
         return _name;
     }
 
-    public int getTaxID() {
-        return _taxID;
+    public int getTaxId() {
+        return _taxId;
     }
 
     public boolean notificationsOn() {
@@ -123,7 +123,7 @@ public class Client implements Serializable {
         return "CLIENT|" + 
                 getKey() + "|" + 
                 getName() + "|" +
-                getTaxID() + "|" + 
+                getTaxId() + "|" + 
                 getClientType().toString() + "|" + 
                 (notificationsOn() ? "YES" : "NO") + "|" +
                 getNumberOfTerminals() + "|" + 

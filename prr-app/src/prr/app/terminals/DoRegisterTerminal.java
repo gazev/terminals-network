@@ -16,18 +16,18 @@ class DoRegisterTerminal extends Command<Network> {
 
 	DoRegisterTerminal(Network receiver) {
 		super(Label.REGISTER_TERMINAL, receiver);
-        addStringField("key", Prompt.terminalKey());
+        addStringField("terminalKey", Prompt.terminalKey());
         addOptionField("type", Prompt.terminalType(), "BASIC", "FANCY");
-        addStringField("owner", Prompt.clientKey());
+        addStringField("ownerKey", Prompt.clientKey());
 	}
 
 	@Override
 	protected final void execute() throws CommandException {
         try {
             _receiver.registerTerminal(
-                                stringField("key"),
+                                stringField("terminalKey"),
                                     stringField("type"), 
-                                        stringField("owner"));
+                                        stringField("ownerKey"));
         } catch (prr.exceptions.DuplicateTerminalKeyException e) {
             throw new DuplicateTerminalKeyException(e.getKey());
         } catch (prr.exceptions.InvalidTerminalKeyException e) {
