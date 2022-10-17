@@ -7,7 +7,16 @@ public class SilentTerminalState implements TerminalState, Serializable {
     @Serial
     /** Serial number for serialization. */
 	private static final long serialVersionUID = 202208091753L;
-   // TODO 
+    
+    @Override
+    public boolean canEndCurrentCommunication(Terminal context) {
+        return false;
+    }
+    @Override
+    public boolean canStartCommunication(Terminal context) {
+        return true;
+    }
+
     @Override
     public String toString() {
         return "SILENT";

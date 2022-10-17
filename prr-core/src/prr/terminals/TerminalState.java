@@ -1,5 +1,6 @@
 package prr.terminals;
 
 public interface TerminalState {
-    // TODO
+    public boolean canEndCurrentCommunication(Terminal context);
+    public boolean canStartCommunication(Terminal context);
 }

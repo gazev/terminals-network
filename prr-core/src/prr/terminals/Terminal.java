@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import prr.clients.Client;
 import prr.communications.Communication;
+import prr.exceptions.NoActiveCommunication;
 
 // FIXME add more import if needed (cannot import from pt.tecnico or prr.app)
 
@@ -56,7 +57,11 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             return _key;
         }
 
-        public Communication getActiveCommunication() {
+        public Communication getActiveCommunication() throws NoActiveCommunication {
+            // terminal doesn't have an active communication 
+            if(_activeCommunication == null)
+                throw new NoActiveCommunication();
+
             return _activeCommunication;
         }
 
@@ -72,22 +77,8 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             return 0;
         }
 
-        public Integer getBalance() {
-            return 0;
-        }
-
         public TerminalState getState() {
             return _state;
-        }
-
-        public boolean isOn() {
-            if(_state instanceof OnTerminalState)
-                return true;
-            return false;
-        }
-
-        public boolean isOff() {
-            return _state instanceof OffTerminalState;
         }
 
         /**
@@ -113,9 +104,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          *          it was the originator of this communication.
          **/
         public boolean canEndCurrentCommunication() {
-            if(getActiveCommunication() != null)
-        	    return true;
-            return false;
+            return _state.canEndCurrentCommunication(this);
         }
 
         /**
@@ -124,19 +113,19 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * @return true if this terminal is neither off neither busy, false otherwise.
          **/
         public boolean canStartCommunication() {
-            if(!isOff() && (getActiveCommunication() == null))
-                return true;
-            return false;
+            return _state.canStartCommunication(this);
         }
 
         /**
          * Returns string that represents this Terminal
          * <p>
          * Formats:
+         * <p>
          * {@code terminal-key|owner-key|state|debt|paid}
+         * <p>
          * {@code terminal-key|owner-key|state|debt|paid|friend1,friend2,...,friendN}
          * 
-         * @see java.lang.Object#toString()
+         * @see java.lang.Terminal#toString()
          */
         @Override
         public String toString() {

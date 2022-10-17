@@ -142,9 +142,6 @@ public class Network implements Serializable {
         setDirty();
     }
 
-
-
-
 	/**
 	 * Read text input file and create corresponding domain entities.
 	 *
@@ -246,7 +243,7 @@ public class Network implements Serializable {
         if(fields.length != 4)
             throw new BadEntryException(String.join("|", fields));
         
-        // determine the terminal type
+        // determine the terminal state
         TerminalState state = switch(fields[3]) {
         case "ON"     -> new OnTerminalState();
         case "SILENT" -> new SilentTerminalState();
@@ -272,6 +269,7 @@ public class Network implements Serializable {
             }
         }
     }
+    
 
     /**
      * Parses and imports a list of friends of a Terminal

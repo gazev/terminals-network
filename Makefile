@@ -1,6 +1,6 @@
 CLASSPATH :=../po-uilib/po-uilib.jar:./prr-app/prr-app.jar:./prr-core/prr-core.jar
 
-.PHONY = all clean install run test
+.PHONY = all clean install run test tests
 
 all:
 	(cd prr-core; make $(MFLAGS) all)
@@ -19,8 +19,6 @@ install:
 run:
 	java -cp $(CLASSPATH) prr.app.App
 
-ptests:
-	@./runtests.sh $(CLASSPATH) publictest
-
 test: 
 	@./runtests.sh $(CLASSPATH) tests
+
