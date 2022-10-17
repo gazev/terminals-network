@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"prr"},{"l":"prr.clients"},{"l":"prr.communications"},{"l":"prr.exceptions"},{"l":"prr.terminals"}];updateSearchResults();

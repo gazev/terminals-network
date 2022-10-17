@@ -4,4 +4,4 @@ CVS/
 *.jar
 .vscode/
 tests/
-publictest/
+docs/

@@ -32,20 +32,19 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         private Communication _activeCommunication;
 
         /** List of Clients that are awaiting this Terminal State update */
-        private List<Client> _clientObservers;
+        private List<Client> _clientObservers = new ArrayList<>();
 
         /** List of communications started by this Terminal */
-        private Map<Integer, Communication> _communications;
+        private List<Communication> _receivedCommunications = new ArrayList<>();
+
+        /** List of communications recieved by this Terminal */
+        private List<Communication> _sentCommunications = new ArrayList<>();
 
         /** The current State of this Terminal */
         private TerminalState _state;
 
         /** Terminal friends of this Terminal */
         private Map<String, Terminal> _friends = new TreeMap<>();
-
-        // FIXME define contructor(s)
-        // FIXME define methods
-
 
         public Terminal(String key, Client owner) {
             _key = key;
@@ -57,6 +56,13 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             return _key;
         }
 
+        /**
+         * Returns Terminal's currently active Communication
+         *  
+         * @return Current active Communication
+         * 
+         * @throws NoActiveCommunication if there is not active communication
+         */
         public Communication getActiveCommunication() throws NoActiveCommunication {
             // terminal doesn't have an active communication 
             if(_activeCommunication == null)
@@ -65,28 +71,40 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             return _activeCommunication;
         }
 
-        public Client getOwner() {
-            return _owner;
+        public Client getOwner() { return _owner; }
+
+        public Integer getPaidBalance() { return 0; }
+
+        public Integer getDebtBalance() { return 0; }
+
+        public TerminalState getState() { return _state; }
+
+        public List<Communication> getStartedCommunications() {
+            return _sentCommunications;
         }
 
-        public Integer getPaid() {
-            return 0;
+        public List<Communication> getReceivedCommunications() {
+            return _receivedCommunications;
         }
 
-        public Integer getDebt() {
-            return 0;
-        }
-
-        public TerminalState getState() {
-            return _state;
+        /**
+         * Adds given Terminal to Terminal's friend list 
+         * 
+         * @param t Terminal to be added to the Friend's list
+         */
+        public void addFriend(Terminal terminal) {
+            _friends.put(terminal.getKey(), terminal);
         }
 
         /**
          * 
-         * @param t
+         * @param key Terminal's key 
+         * 
+         * @return true if Terminal with given key is friends with
+         *         given Terminal
          */
-        public void addFriend(Terminal t) {
-            _friends.put(t.getKey(), t);
+        public boolean isFriend(String key) {
+            return _friends.containsKey(key);
         }
 
         public TerminalState getTerminalState() {
