@@ -7,6 +7,9 @@ public class BasicTerminal extends Terminal {
         super(key, owner);
     }
 
+    /**
+     * @see prr.terminals.Terminal#toString()
+     */
     @Override
     public String toString() {
         return "BASIC|" + super.toString();

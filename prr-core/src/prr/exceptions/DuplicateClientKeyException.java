@@ -2,7 +2,10 @@ package prr.exceptions;
 
 import java.io.Serial;
 
-/** Exception thrown when a client key is duplicated. */
+/** 
+ * Exception thrown when trying to create a Client with a
+ * key that is already registered in the Network
+ */
 public class DuplicateClientKeyException extends Exception {
 
 	/** Serial number for serialization. */

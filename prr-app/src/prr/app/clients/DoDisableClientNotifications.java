@@ -18,7 +18,6 @@ class DoDisableClientNotifications extends Command<Network> {
 
 	@Override
 	protected final void execute() throws CommandException {
-		System.out.println("Hi");
-                //FIXME implement command
+		// TODO
 	}
 }

@@ -2,6 +2,9 @@ package prr.exceptions;
 
 import java.io.Serial;
 
+/**
+ * Thrown when an invalid key is provided to register a new Terminal
+ */
 public class InvalidTerminalKeyException extends Exception {
 	/** Serial number for serialization. */
     @Serial

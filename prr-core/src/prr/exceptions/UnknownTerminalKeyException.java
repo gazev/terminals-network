@@ -2,6 +2,7 @@ package prr.exceptions;
 
 import java.io.Serial;
 
+/** Thrown when a Terminal with provided key doesn't exist */
 public class UnknownTerminalKeyException extends Exception {
 	/** Serial number for serialization. */
     @Serial

@@ -7,10 +7,13 @@ public class TextCommunication extends Communication {
     /** This communication's message */
     String _text;
 
+    // TODO
+
     TextCommunication(Terminal sender, Terminal receiver, String text) {
         super(sender, receiver);
         _text = text;
-        setUnits(text.length());
+        _finished = true;
+        _units = text.length();
     }
     
 }

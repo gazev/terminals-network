@@ -3,31 +3,37 @@ package prr.communications;
 import prr.terminals.Terminal;
 
 public abstract class Communication {
+    /** Static counter of total Communications on the Network */
     private static Integer _count = 0;
 
     /** Communication identifying integer */
-    private final Integer _number;
+    protected final Integer _number;
 
     /** Terminal that started this Communication */
-    private Terminal _sender;
+    protected Terminal _sender;
+
     /** Terminal that received this Communication */
-    private Terminal _receiver;
+    protected Terminal _receiver;
 
     /** Marks Communication as finished or on going */
-    private boolean _finished;
+    protected boolean _finished;
 
     /** Marks Communication has paid */
     protected boolean _paid;
 
     /** Text chars or duration units */
-    private Integer _units;
+    protected Integer _units;
 
+    /**
+     * 
+     * @param sender Terminal starting the communication
+     * @param receiver Terminal receiving the communication
+     */
     Communication(Terminal sender, Terminal receiver) {
        _number = Communication._count++;
        _sender = sender;
        _receiver = receiver; 
        _paid = false;
-       _finished = false;
     }
 
     public Integer getNumber() { return _number; }
@@ -47,5 +53,7 @@ public abstract class Communication {
     public void setPaid() { _paid = true; }
 
     public void setUnits(Integer units) { _units = units; }
+
+    // TODO - calculatePrice...
     
 }

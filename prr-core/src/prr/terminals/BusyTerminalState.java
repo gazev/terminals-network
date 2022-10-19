@@ -10,6 +10,7 @@ public class BusyTerminalState implements TerminalState, Serializable {
     /** Serial number for serialization. */
 	private static final long serialVersionUID = 202208091753L;
 
+    /** @see prr.terminals.TerminalState#canEndCurrentCommunication(Terminal) */
     @Override
     public boolean canEndCurrentCommunication(Terminal context) {
         // if terminal doesn't have an active communication, return false
@@ -21,11 +22,13 @@ public class BusyTerminalState implements TerminalState, Serializable {
         return true;
     }
 
+    /** @see prr.terminals.TerminalState#canStartCommunication(Terminal) */
     @Override
     public boolean canStartCommunication(Terminal context) {
         return false;
     }
 
+    /** @see java.lang.Object#toString() */
     @Override
     public String toString() {
         return "BUSY";

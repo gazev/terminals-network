@@ -2,9 +2,10 @@ package prr.exceptions;
 
 import java.io.Serial;
 
-/* Exception thrown when trying to import entities that violate Network
+/**
+ * Thrown when trying to import entities that violate Network
  * constraints, such as, Clients with same keys, Terminals with unexistant
- * Clients, etc.
+ * Clients owners, etc.
  */
 public class IllegalEntryException extends Exception {
     

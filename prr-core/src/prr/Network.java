@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
-
+import java.util.stream.Stream;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,7 +37,8 @@ import prr.exceptions.UnrecognizedEntryException;
 // FIXME add more import if needed (cannot import from pt.tecnico or prr.app)
 
 /**
- * Class Store implements a network.
+ * Class Network implements a Network of terminals that can
+ * communicate with each other 
  */
 public class Network implements Serializable {
 
@@ -121,18 +122,28 @@ public class Network implements Serializable {
     public Collection<Terminal> getAllTerminals() { return _terminals.values(); }
 
 
-	public Collection<Terminal> getUnusedTerminals(){
-		List<Terminal> termAux = new ArrayList<>();
-		for(Terminal t : getAllTerminals()){
-			if(t.getReceivedCommunications().size() == 0 &&
-					t.getStartedCommunications().size() == 0 ){
-						termAux.add(t);
+    /**
+     * 
+     * 
+     * @return Stream of Terminals that haven't started or received any
+     *         communications
+     */
+	public Stream<Terminal> getUnusedTerminals(){
+        // TODO explain and keep/remove for final version based on everyone's understanding
+        return _terminals.values().stream()
+                                  .filter(t -> 
+                                    t.getReceivedCommunications().size() == 0 &&
+                                        t.getStartedCommunications().size() == 0);
 
-			}
-		}
-		return termAux;
+		//List<Terminal> termAux = new ArrayList<>();
+		//for(Terminal t : _terminals.values()){
+		//	if(t.getReceivedCommunications().size() == 0 &&
+		//			            t.getStartedCommunications().size() == 0 ){
+		//			termAux.add(t);
+		//	}
+		//}
+		//return termAux;
 	}
-
 
 
     /**
@@ -144,6 +155,7 @@ public class Network implements Serializable {
         _clients.put(client.getKey(), client);
         setDirty();
     }
+
 
     /**
      * Add given Terminal to the Network
@@ -157,8 +169,9 @@ public class Network implements Serializable {
         setDirty();
     }
 
+
 	/**
-	 * Read text input file and create corresponding domain entities.
+	 * Reads a text input file and creates corresponding Network entities.
 	 *
 	 * @param filename name of the text input file
      *
@@ -186,7 +199,10 @@ public class Network implements Serializable {
 		}
     }
 
+
 	/**
+     * Parses a line from a text file describing an entity in the Network
+     * 
 	 * @param inputLine line to be parsed
      *
      * @throws UnrecognizedEntryException if a specified entity doesn't exist
@@ -209,6 +225,7 @@ public class Network implements Serializable {
                throw new UnrecognizedEntryException(fields[0]);
         }
 	}
+
 
     /**
      * Parses and imports a Client entity.
@@ -234,6 +251,7 @@ public class Network implements Serializable {
             throw new IllegalEntryException(fields[1]);
         }
     }
+
 
     /**
      * Parses and imports a Terminal entity.
@@ -313,6 +331,7 @@ public class Network implements Serializable {
         }
     }
 
+
     /**
      * Registers a Client into the Network with the specified attributes
      *
@@ -330,6 +349,7 @@ public class Network implements Serializable {
 			throw new DuplicateClientKeyException(key);
         addClient(new Client(key, name, taxId));
 	}
+
 
     /**
      * Registers a Terminal in the Network with specified attributes

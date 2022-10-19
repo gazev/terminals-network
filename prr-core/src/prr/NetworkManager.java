@@ -16,8 +16,6 @@ import prr.exceptions.MissingFileAssociationException;
 import prr.exceptions.UnavailableFileException;
 import prr.exceptions.UnrecognizedEntryException;
 
-//FIXME add more import if needed (cannot import from pt.tecnico or prr.app)
-
 /**
  * Manage access to network and implement load/save operations.
  */
@@ -38,19 +36,6 @@ public class NetworkManager {
 	}
 
 	/**
-	 * 
-	 * @return name of the file associated with the current Network instance
-	 */
-	public String getFilename() {
-		return _filename;
-	}
-
-	public void setFilename(String filename) {
-		_filename = filename;
-	}
-
-
-	/**
 	 * @param filename name of the file containing the serialized application's state
          *        to load.
 	 * @throws UnavailableFileException if the specified file does not exist or there is
@@ -65,7 +50,7 @@ public class NetworkManager {
 		} catch(IOException | ClassNotFoundException e) {
 			throw new UnavailableFileException(filename);
 		}
-		setFilename(filename);
+		_filename = filename;
 	}
 
 	/**
@@ -76,34 +61,39 @@ public class NetworkManager {
 	 * @throws IOException if there is some error while serializing the state of the network to disk.
 	 */
 	public void save() throws FileNotFoundException, MissingFileAssociationException, IOException {
-		/* No file associated with this instance of the application */
-		if(getFilename() == null || getFilename().isBlank())
+		// No file associated with this instance of the application
+		if(_filename == null || _filename.isBlank())
 			throw new MissingFileAssociationException();
 
-		/* Write Network object to file */
+		// Write Network object to file
 		if(_network.isDirty()) {
-			FileOutputStream f = new FileOutputStream(getFilename());
+			FileOutputStream f = new FileOutputStream(_filename);
 			BufferedOutputStream b = new BufferedOutputStream(f);
 			ObjectOutput o = new ObjectOutputStream(b);
 			o.writeObject(_network);
 			o.close();
-			/* After save, Network data is not dirty */
+			// After save, Network data is not dirty
 			_network.setClean();
 		}
 	}
 
 	/**
-     * Saves the serialized application's state into the specified file. The current network is
-     * associated to this file.
+     * Saves the serialized application's state into the specified file. This file becomes
+	 * associated with the current Network instance 
      *
-	 * @param filename the name of the file.
+	 * @param filename the name of the file
 	 * 
-	 * @throws FileNotFoundException if for some reason the file cannot be created or opened.
-	 * @throws MissingFileAssociationException if the current network does not have a file.
-	 * @throws IOException if there is some error while serializing the state of the network to disk.
+	 * @throws FileNotFoundException if for some reason the file cannot be 
+	 *                               created or opened.
+	 * @throws MissingFileAssociationException if the current network does not 
+	 *                                         have a file.
+	 * @throws IOException if there is some error while serializing the state 
+	 *                     of the network to disk.
 	 */
-	public void saveAs(String filename) throws FileNotFoundException, MissingFileAssociationException, IOException {
-		setFilename(filename);
+	public void saveAs(String filename) throws FileNotFoundException,
+													MissingFileAssociationException,
+														IOException {
+		_filename = filename;
 		save();
 	}
 
@@ -113,14 +103,17 @@ public class NetworkManager {
 	 * @param filename name of the text input file
 	 * 
 	 * @throws ImportFileException if there are problems with input entries
-	 *                             e.g (unknown entity specified, wrong types for
+	 *                             e.g unknown entity specified, wrong types for
 	 *                             a specific entity or entries that violate
-	 *                             Network's integrity contraints) 
+	 *                             Network's integrity contraints
 	 */
 	public void importFile(String filename) throws ImportFileException {
 		try {
             _network.importFile(filename);
-        } catch (IOException | UnrecognizedEntryException | BadEntryException | IllegalEntryException e) {
+        } catch (IOException 
+				| UnrecognizedEntryException 
+				| BadEntryException 
+				| IllegalEntryException e) {
             throw new ImportFileException(filename, e);
     	}
 	}

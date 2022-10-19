@@ -2,6 +2,9 @@ package prr.exceptions;
 
 import java.io.Serial;
 
+/**
+ * Thrown when a Terminal key is duplicated 
+ */
 public class DuplicateTerminalKeyException extends Exception {
 	/** Serial number for serialization. */
     @Serial

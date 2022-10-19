@@ -28,6 +28,10 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         /** Client that owns this Terminal */
         private Client _owner;
 
+        private Integer _paidBalance = 0;
+
+        private Integer _debtBalance = 0;
+
         /** Current ongoing communication */
         private Communication _activeCommunication;
 
@@ -73,9 +77,9 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         public Client getOwner() { return _owner; }
 
-        public Integer getPaidBalance() { return 0; }
+        public Integer getPaidBalance() { return _paidBalance; }
 
-        public Integer getDebtBalance() { return 0; }
+        public Integer getDebtBalance() { return _debtBalance; }
 
         public TerminalState getState() { return _state; }
 
@@ -90,13 +94,26 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         /**
          * Adds given Terminal to Terminal's friend list
          *
-         * @param t Terminal to be added to the Friend's list
+         * @param t Terminal to be added to the Friends list
          */
         public void addFriend(Terminal terminal) {
+            // TODO integrity check
             _friends.put(terminal.getKey(), terminal);
         }
 
         /**
+         * Removes given Terminal from Terminal's friend list
+         * 
+         * @param terminal Terminal to be removed from Friends list
+         */
+        public void removeFriend(Terminal terminal) {
+            // TODO integrity check
+            _friends.remove(terminal.getKey());
+        }
+
+        /**
+         * Returns True if Terminal with given key is a 
+         * friend 
          *
          * @param key Terminal's key
          *
@@ -135,15 +152,15 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         }
 
         /**
-         * Returns string that represents this Terminal
-         * <p>
+         * Returns String representation of the Terminal
+         * 
          * Formats:
          * <p>
-         * {@code terminal-key|owner-key|state|debt|paid}
+         * {@code type|terminal-key|owner-key|state|debt|paid}
          * <p>
-         * {@code terminal-key|owner-key|state|debt|paid|friend1,friend2,...,friendN}
-         *
-         * @see java.lang.Terminal#toString()
+         * {@code type|terminal-key|owner-key|state|debt|paid|friend1,friend2,...,friendN}
+         * 
+         * @see java.lang.Object#toString()
          */
         @Override
         public String toString() {
@@ -156,11 +173,11 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             }
 
             return
-                getKey() + "|" +
-                getOwner().getKey() + "|" +
-                getState() + "|" +
-                getPaidBalance() + "|" +
-                getDebtBalance() +
+                _key + "|" +
+                _owner.getKey() + "|" +
+                _state + "|" +
+                _paidBalance + "|" +
+                _debtBalance +
                 (friendsString.isEmpty() ? "" : "|" + friendsString);
         }
 }
