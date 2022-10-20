@@ -1,13 +1,13 @@
 package prr;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 
 import prr.exceptions.BadEntryException;
 import prr.exceptions.IllegalEntryException;
@@ -37,9 +37,9 @@ public class NetworkManager {
 
 	/**
 	 * @param filename name of the file containing the serialized application's state
-         *        to load.
+     *                 to load.
 	 * @throws UnavailableFileException if the specified file does not exist or there is
-         *         an error while processing this file.
+     *                                  an error while processing this file.
 	 */
 	public void load(String filename) throws UnavailableFileException {
 		try {
@@ -61,18 +61,18 @@ public class NetworkManager {
 	 * @throws IOException if there is some error while serializing the state of the network to disk.
 	 */
 	public void save() throws FileNotFoundException, MissingFileAssociationException, IOException {
-		// No file associated with this instance of the application
+		// no file associated with this instance of the application
 		if(_filename == null || _filename.isBlank())
 			throw new MissingFileAssociationException();
 
-		// Write Network object to file
+		// write Network object to file
 		if(_network.isDirty()) {
 			FileOutputStream f = new FileOutputStream(_filename);
 			BufferedOutputStream b = new BufferedOutputStream(f);
 			ObjectOutput o = new ObjectOutputStream(b);
 			o.writeObject(_network);
 			o.close();
-			// After save, Network data is not dirty
+			// after save, Network data is not dirty
 			_network.setClean();
 		}
 	}

@@ -3,7 +3,8 @@ package prr.exceptions;
 import java.io.Serial;
 
 /**
- * Thrown when a Terminal key is duplicated 
+ * Exception thrown when trying to create a Terminal with a key that is already
+ * registered in the Network 
  */
 public class DuplicateTerminalKeyException extends Exception {
 	/** Serial number for serialization. */

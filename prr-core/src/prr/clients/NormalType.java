@@ -10,6 +10,7 @@ public class NormalType implements ClientType, Serializable {
 
     // TODO
 
+    /** @see java.lang.Object#toString() */
     @Override
     public String toString() {
         return "NORMAL";

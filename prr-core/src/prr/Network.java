@@ -279,7 +279,7 @@ public class Network implements Serializable {
         // determine the terminal state
         TerminalState state = switch(fields[3]) {
         case "ON"     -> new OnTerminalState();
-        case "SILENT" -> new SilentTerminalState();
+        case "SILENCE" -> new SilentTerminalState();
         case "BUSY"   -> new BusyTerminalState();
         case "OFF"    -> new OffTerminalState();
         default ->

@@ -19,7 +19,6 @@ class DoOpenMenuTerminalConsole extends Command<Network> {
 
 	@Override
 	protected final void execute() throws CommandException {
-                //FIXME implement command
                 try {
                     Terminal t = _receiver.getTerminalByKey(stringField("key"));
                     new prr.app.terminal.Menu(_receiver, t).open();

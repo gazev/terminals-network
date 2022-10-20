@@ -14,12 +14,15 @@ public class OffTerminalState implements TerminalState, Serializable {
         return false;
     }
 
+    // TODO
+    
     /** @see prr.terminals.TerminalState#canStartCommunication(Terminal) */
     @Override
     public boolean canStartCommunication(Terminal context) {
         return false;
     }
 
+    /** @see java.lang.Object#toString() */
     @Override
     public String toString() {
         return "OFF";

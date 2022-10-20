@@ -10,6 +10,8 @@ public interface TerminalState {
      */
     public boolean canEndCurrentCommunication(Terminal context);
 
+    // TODO
+    
     /**
      * Returns true if Terminal can start a new interactive
      * Communication and false elsewise

@@ -3,7 +3,7 @@ package prr.exceptions;
 import java.io.Serial;
 
 /**
- * Thrown when a Client with a given key doesn't exist
+ * Exception thrown when a Client with a given key doesn't exist
  */
 public class UnknownClientKeyException extends Exception {
 	/** Serial number for serialization. */

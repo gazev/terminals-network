@@ -36,6 +36,7 @@ public abstract class Communication {
        _paid = false;
     }
 
+    // TODO
     public Integer getNumber() { return _number; }
 
     public Terminal getSender() { return _sender; }

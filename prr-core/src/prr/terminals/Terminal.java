@@ -50,15 +50,29 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         /** Terminal friends of this Terminal */
         private Map<String, Terminal> _friends = new TreeMap<>();
 
+        /**
+         * 
+         * @param key Terinal identifying key
+         * @param owner Terminal's Client owner
+         */
         public Terminal(String key, Client owner) {
             _key = key;
             _owner = owner;
             _state = new OnTerminalState();
         }
 
-        public String getKey() {
-            return _key;
-        }
+        /**
+         * Returns Terminal's identifying key
+         * 
+         * @return Terminal key
+         */
+        public String getKey() { return _key; }
+
+        /**
+         * Returns Terminal's owner
+         * @return
+         */
+        public Client getOwner() { return _owner; }
 
         /**
          * Returns Terminal's currently active Communication
@@ -75,18 +89,41 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             return _activeCommunication;
         }
 
-        public Client getOwner() { return _owner; }
-
+        /**
+         * Returns Terminal's total paid balance in Communication's prices
+         * 
+         * @return paid balance
+         */
         public Integer getPaidBalance() { return _paidBalance; }
 
+        /**
+         * Returns Terminal's total debt balance in Communication's prices
+         * 
+         * @return debt balance
+         */
         public Integer getDebtBalance() { return _debtBalance; }
 
+        /**
+         * Returns current Terminal's state
+         * 
+         * @return Terminal's state
+         */
         public TerminalState getState() { return _state; }
 
+        /**
+         * Returns a List of all Communications started by Terminal
+         * 
+         * @return List of Communications started by this Terminal
+         */
         public List<Communication> getStartedCommunications() {
             return _sentCommunications;
         }
 
+        /**
+         * Returns a List of all Communications received by Terminal
+         * 
+         * @return List of Communications received by Terminal
+         */
         public List<Communication> getReceivedCommunications() {
             return _receivedCommunications;
         }

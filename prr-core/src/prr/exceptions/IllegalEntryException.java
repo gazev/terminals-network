@@ -3,7 +3,7 @@ package prr.exceptions;
 import java.io.Serial;
 
 /**
- * Thrown when trying to import entities that violate Network
+ * Exception thrown when trying to import entities that violate Network
  * constraints, such as, Clients with same keys, Terminals with unexistant
  * Clients owners, etc.
  */

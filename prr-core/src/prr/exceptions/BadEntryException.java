@@ -3,7 +3,7 @@ package prr.exceptions;
 import java.io.Serial;
 
 /**
- * Exception for import file entries that do not provide the
+ * Exception thrown when import file has entries that do not provide the
  * correct fields for an entity
  */
 public class BadEntryException extends Exception {

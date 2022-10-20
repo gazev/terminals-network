@@ -1,7 +1,8 @@
 package prr.exceptions;
 
 /**
- * Exception for unknown import file entries.
+ * Exception thrown when an unknown entity is specified when 
+ * importing from a file
  */
 public class UnrecognizedEntryException extends Exception {
 

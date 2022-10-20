@@ -50,6 +50,7 @@ public class Client implements Serializable {
         }
     }; 
 
+    /** Notificaitons that Clients receive */
     public class Notification {
         public Notification() {}
         // TODO
@@ -117,7 +118,7 @@ public class Client implements Serializable {
     }
 
     /**
-     * Returns this Client's balance in debt, by checking each of his Terminal's
+     * Returns this Client's balance in debt by checking each of his Terminal's
      * debt balance.
      * 
      * @return Client's debt balance
@@ -131,7 +132,7 @@ public class Client implements Serializable {
     }
 
     /** 
-     * Returns this Client's balance paid, by checking each of his Terminal's
+     * Returns this Client's balance paid by checking each of his Terminal's
      * paid balance.
      * 
      * @reutrn Client's paid balance
