@@ -3,11 +3,14 @@ package prr.clients;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 
 import prr.terminals.Terminal;
 
+/** A Client in the Network */
 public class Client implements Serializable {
 
     @Serial
@@ -30,7 +33,7 @@ public class Client implements Serializable {
     Map<String, Terminal> _terminals = new TreeMap<>();
 
     /** Client's notifications not yet delivered */
-    ArrayList<Notification> _notificationsLog = new ArrayList<>();
+    Queue<Notification> _notificationsLog = new LinkedList<>();
 
     /** Flag to determine if Client should be notified */
     boolean _notificationsOn = true;

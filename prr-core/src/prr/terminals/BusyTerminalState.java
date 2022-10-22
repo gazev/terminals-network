@@ -22,6 +22,8 @@ public class BusyTerminalState implements TerminalState, Serializable {
         return true;
     }
 
+    // TODO
+
     /** @see prr.terminals.TerminalState#canStartCommunication(Terminal) */
     @Override
     public boolean canStartCommunication(Terminal context) {
