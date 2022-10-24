@@ -3,5 +3,4 @@ CVS/
 *.class
 *.jar
 .vscode/
-tests/
 docs/
