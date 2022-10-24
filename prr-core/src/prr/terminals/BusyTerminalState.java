@@ -12,13 +12,7 @@ public class BusyTerminalState implements TerminalState, Serializable {
 
     /** @see prr.terminals.TerminalState#canEndCurrentCommunication(Terminal) */
     @Override
-    public boolean canEndCurrentCommunication(Terminal context) {
-        // if terminal doesn't have an active communication, return false
-        try {
-            context.getActiveCommunication();
-        } catch (NoActiveCommunication e) {
-            return false;
-        }
+    public boolean canEndCurrentCommunication() {
         return true;
     }
 
@@ -26,8 +20,27 @@ public class BusyTerminalState implements TerminalState, Serializable {
 
     /** @see prr.terminals.TerminalState#canStartCommunication(Terminal) */
     @Override
-    public boolean canStartCommunication(Terminal context) {
+    public boolean canStartCommunication() {
         return false;
+    }
+    
+    @Override
+    public boolean canReceiveTextCommunication() {
+        return true;
+    }
+
+    @Override
+    public boolean canReceiveInteractiveCommunication() {
+        return false;
+    }
+
+    @Override
+    public void changeTerminalState(Terminal context, TerminalState state) {
+        // cannot change from busy to off
+        if(state.getClass().equals(OffTerminalState.class)) {
+            return;
+        }
+        context.setTerminalState(state);
     }
 
     /** @see java.lang.Object#toString() */

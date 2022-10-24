@@ -1,6 +1,7 @@
 package prr.app.terminal;
 
 import prr.Network;
+import prr.app.exceptions.UnknownTerminalKeyException;
 import prr.terminals.Terminal;
 import pt.tecnico.uilib.menus.CommandException;
 //FIXME add more imports if needed
@@ -16,6 +17,9 @@ class DoShowTerminalBalance extends TerminalCommand {
 
 	@Override
 	protected final void execute() throws CommandException {
-                //FIXME implement command
+		_display.popup(
+			Message.terminalPaymentsAndDebts(_receiver.getKey(), 
+												_receiver.getPaidBalance(), 
+													_receiver.getPaidBalance()));
 	}
 }

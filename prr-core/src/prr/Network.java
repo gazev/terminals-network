@@ -2,6 +2,8 @@ package prr;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -30,6 +32,7 @@ import prr.exceptions.DuplicateTerminalKeyException;
 import prr.exceptions.IllegalEntryException;
 import prr.exceptions.ImportFileException;
 import prr.exceptions.InvalidTerminalKeyException;
+import prr.exceptions.SameTerminalStateException;
 import prr.exceptions.UnknownClientKeyException;
 import prr.exceptions.UnknownTerminalKeyException;
 import prr.exceptions.UnrecognizedEntryException;
@@ -145,6 +148,27 @@ public class Network implements Serializable {
 		//return termAux;
 	}
 
+    public Collection<Communication> getAllCommunications() {
+        List<Communication> comms = new ArrayList<>();
+        for(Client c : _clients.values()) {
+            for(Terminal t : c.getTerminals()) {
+                comms.addAll(t.getStartedCommunications());
+            }
+        }
+        Collections.sort(comms);
+
+        return comms;
+    }
+    
+    public Collection<Communication> getCommunicationsStartedByClient(Client client) {
+        List<Communication> comms = new ArrayList<>();
+        for(Terminal t : client.getTerminals()) {
+            comms.addAll(t.getStartedCommunications());
+        }
+        Collections.sort(comms);
+
+        return comms;
+    }
 
     /**
      * Adds given Client to the Network
@@ -279,7 +303,7 @@ public class Network implements Serializable {
         // determine the terminal state
         TerminalState state = switch(fields[3]) {
         case "ON"     -> new OnTerminalState();
-        case "SILENCjE" -> new SilentTerminalState();
+        case "SILENCE" -> new SilentTerminalState();
         case "BUSY"   -> new BusyTerminalState();
         case "OFF"    -> new OffTerminalState();
         default ->
@@ -287,16 +311,11 @@ public class Network implements Serializable {
         };
 
         try {
-            registerTerminal(fields[1], fields[0], fields[2]);
-            getTerminalByKey(fields[1]).setTerminalState(state);
+            registerTerminalFromImport(fields[1], fields[0], fields[2], state);
         } catch (InvalidTerminalKeyException
                 | DuplicateTerminalKeyException
                 | UnknownClientKeyException e) {
             throw new IllegalEntryException(String.join("|", fields));
-        } catch (UnknownTerminalKeyException e) {
-            /* doesn't happen, consequence of using the same function to register an
-            imported terminal or an app registered one */
-            e.printStackTrace();
         }
     }
 
@@ -381,5 +400,24 @@ public class Network implements Serializable {
         addTerminal(type.equals("BASIC") ?
             new BasicTerminal(terminalKey, getClientByKey(ownerKey)) :
                 new FancyTerminal(terminalKey, getClientByKey(ownerKey)));
+    }
+
+    public void registerTerminalFromImport(String terminalKey, String type, String ownerKey, 
+                                                TerminalState state) throws
+                                                    InvalidTerminalKeyException,
+                                                        DuplicateTerminalKeyException,
+                                                            UnknownClientKeyException {
+        // check the key has only 6 digits (\d <=> [0,9] regex)
+        if(!terminalKey.matches("\\d{6}"))
+            throw new InvalidTerminalKeyException(terminalKey);
+
+        // check if Terminal with given key already exists
+        if(_terminals.containsKey(terminalKey))
+            throw new DuplicateTerminalKeyException(terminalKey);
+
+        // add Terminal to the Network
+        addTerminal(type.equals("BASIC") ?
+            new BasicTerminal(terminalKey, getClientByKey(ownerKey), state) :
+                new FancyTerminal(terminalKey, getClientByKey(ownerKey), state));
     }
 }

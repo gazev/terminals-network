@@ -9,11 +9,16 @@ public class TextCommunication extends Communication {
 
     // TODO
 
-    TextCommunication(Terminal sender, Terminal receiver, String text) {
+    public TextCommunication(Terminal sender, Terminal receiver, String text) {
         super(sender, receiver);
         _text = text;
         _finished = true;
         _units = text.length();
+        _price = determinePrice(_units);
+    }
+
+    public Integer determinePrice(Integer _units) {
+        return _units;
     }
     
 }

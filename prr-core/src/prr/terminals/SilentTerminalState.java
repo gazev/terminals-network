@@ -10,16 +10,29 @@ public class SilentTerminalState implements TerminalState, Serializable {
     
     /** @see prr.terminals.TerminalState#canEndCurrentCommunication(Terminal) */
     @Override
-    public boolean canEndCurrentCommunication(Terminal context) {
+    public boolean canEndCurrentCommunication() {
         return false;
     }
     
-    // TODO
-    
     /** @see prr.terminals.TerminalState#canStartCommunication(Terminal) */
     @Override
-    public boolean canStartCommunication(Terminal context) {
+    public boolean canStartCommunication() {
         return true;
+    }
+
+    @Override
+    public boolean canReceiveTextCommunication() {
+        return true;
+    }
+
+    @Override
+    public boolean canReceiveInteractiveCommunication() {
+        return false;
+    }
+
+    @Override
+    public void changeTerminalState(Terminal context, TerminalState state) {
+        context.setTerminalState(state);
     }
 
     /** @see java.lang.Object#toString() */

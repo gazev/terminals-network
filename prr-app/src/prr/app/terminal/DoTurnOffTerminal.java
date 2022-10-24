@@ -1,6 +1,7 @@
 package prr.app.terminal;
 
 import prr.Network;
+import prr.terminals.OffTerminalState;
 import prr.terminals.Terminal;
 import pt.tecnico.uilib.menus.CommandException;
 //FIXME add more imports if needed
@@ -16,6 +17,10 @@ class DoTurnOffTerminal extends TerminalCommand {
 
 	@Override
 	protected final void execute() throws CommandException {
-                //FIXME implement command
+		try {
+			_receiver.changeTerminalState(new OffTerminalState());
+		} catch (prr.exceptions.SameTerminalStateException e) {
+			_display.popup(Message.alreadyOff());
+		}
 	}
 }

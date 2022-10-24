@@ -3,6 +3,7 @@ package prr.clients;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -102,6 +103,10 @@ public class Client implements Serializable {
      */
     public ClientType getClientType() {
         return _type;
+    }
+
+    public Collection<Terminal> getTerminals() {
+        return _terminals.values();
     }
 
     /**

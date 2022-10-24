@@ -7,6 +7,10 @@ public class FancyTerminal extends BasicTerminal {
         super(key, owner);
     }
 
+    public FancyTerminal(String key, Client owner, TerminalState state) {
+        super(key, owner, state);
+    }
+
     /** 
      * @see prr.terminals.Terminal#toString() 
      */

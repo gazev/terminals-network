@@ -11,8 +11,9 @@ import java.util.TreeMap;
 import prr.clients.Client;
 import prr.communications.Communication;
 import prr.exceptions.NoActiveCommunication;
-
-// FIXME add more import if needed (cannot import from pt.tecnico or prr.app)
+import prr.exceptions.SameTerminalStateException;
+import prr.exceptions.UnavailableFileException;
+import prr.exceptions.UnavailableTerminalException;
 
 /**
  * Abstract terminal.
@@ -28,27 +29,27 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         /** Client that owns this Terminal */
         private Client _owner;
 
-        private Integer _paidBalance = 0;
+        protected Integer _paidBalance = 0;
 
-        private Integer _debtBalance = 0;
+        protected Integer _debtBalance = 0;
 
         /** Current ongoing communication */
-        private Communication _activeCommunication;
+        protected Communication _activeCommunication;
 
         /** List of Clients that are awaiting this Terminal State update */
-        private List<Client> _clientObservers = new ArrayList<>();
+        protected List<Client> _clientObservers = new ArrayList<>();
 
         /** List of communications started by this Terminal */
-        private List<Communication> _receivedCommunications = new ArrayList<>();
+        protected List<Communication> _receivedCommunications = new ArrayList<>();
 
         /** List of communications recieved by this Terminal */
-        private List<Communication> _sentCommunications = new ArrayList<>();
+        protected List<Communication> _sentCommunications = new ArrayList<>();
 
         /** The current State of this Terminal */
-        private TerminalState _state;
+        protected TerminalState _state;
 
         /** Terminal friends of this Terminal */
-        private Map<String, Terminal> _friends = new TreeMap<>();
+        protected Map<String, Terminal> _friends = new TreeMap<>();
 
         /**
          * 
@@ -59,6 +60,12 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             _key = key;
             _owner = owner;
             _state = new OnTerminalState();
+        }
+
+        public Terminal(String key, Client owner, TerminalState state) {
+            _key = key;
+            _owner = owner;
+            _state = state;
         }
 
         /**
@@ -73,6 +80,45 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * @return
          */
         public Client getOwner() { return _owner; }
+
+        /**
+         * Returns Terminal's total paid balance in Communication's prices
+         * 
+         * @return paid balance
+         */
+        public Integer getPaidBalance() { return _paidBalance; }
+
+        /**
+         * Returns Terminal's total debt balance in Communication's prices
+         * 
+         * @return debt balance
+         */
+        public Integer getDebtBalance() { return _debtBalance; }
+
+        public TerminalState getTerminalState() { return _state; }
+
+        /**
+         * Returns current Terminal's state
+         * 
+         * @return Terminal's state
+         */
+        public TerminalState getState() { return _state; }
+
+        public void setTerminalState(TerminalState state) { _state = state; }
+
+        /**
+         * Returns a List of all Communications started by Terminal
+         * 
+         * @return List of Communications started by this Terminal
+         */
+        public List<Communication> getStartedCommunications() { return _sentCommunications; }
+
+        /**
+         * Returns a List of all Communications received by Terminal
+         * 
+         * @return List of Communications received by Terminal
+         */
+        public List<Communication> getReceivedCommunications() { return _receivedCommunications; }
 
         /**
          * Returns Terminal's currently active Communication
@@ -90,52 +136,18 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         }
 
         /**
-         * Returns Terminal's total paid balance in Communication's prices
-         * 
-         * @return paid balance
-         */
-        public Integer getPaidBalance() { return _paidBalance; }
-
-        /**
-         * Returns Terminal's total debt balance in Communication's prices
-         * 
-         * @return debt balance
-         */
-        public Integer getDebtBalance() { return _debtBalance; }
-
-        /**
-         * Returns current Terminal's state
-         * 
-         * @return Terminal's state
-         */
-        public TerminalState getState() { return _state; }
-
-        /**
-         * Returns a List of all Communications started by Terminal
-         * 
-         * @return List of Communications started by this Terminal
-         */
-        public List<Communication> getStartedCommunications() {
-            return _sentCommunications;
-        }
-
-        /**
-         * Returns a List of all Communications received by Terminal
-         * 
-         * @return List of Communications received by Terminal
-         */
-        public List<Communication> getReceivedCommunications() {
-            return _receivedCommunications;
-        }
-
-        /**
          * Adds given Terminal to Terminal's friend list
          *
          * @param t Terminal to be added to the Friends list
          */
         public void addFriend(Terminal terminal) {
-            // TODO integrity check
+            // if Terminal already in friends list
+            if(isFriend(terminal)) {
+                return;
+            }
             _friends.put(terminal.getKey(), terminal);
+            // add this Terminal to other Terminal's friend list
+            terminal.addFriend(this);
         }
 
         /**
@@ -144,8 +156,12 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * @param terminal Terminal to be removed from Friends list
          */
         public void removeFriend(Terminal terminal) {
-            // TODO integrity check
+            if(!isFriend(terminal)) {
+                return;
+            }
             _friends.remove(terminal.getKey());
+            // remove this Terminal from other's Terinal friends list
+            terminal.removeFriend(this);
         }
 
         /**
@@ -157,16 +173,18 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * @return true if Terminal with given key is friends with
          *         given Terminal
          */
-        public boolean isFriend(String key) {
-            return _friends.containsKey(key);
+        public boolean isFriend(Terminal terminal) {
+            return _friends.containsKey(terminal.getKey());
         }
 
-        public TerminalState getTerminalState() {
-            return _state;
-        }
 
-        public void setTerminalState(TerminalState state) {
-            _state = state;
+        public void changeTerminalState(TerminalState state) throws 
+                                                        SameTerminalStateException {
+            // if trying to change into the same state
+            if(state.getClass().equals(_state.getClass())) {
+                throw new SameTerminalStateException();
+            }
+            _state.changeTerminalState(this, state);
         }
 
         /**
@@ -176,7 +194,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          *          it was the originator of this communication.
          **/
         public boolean canEndCurrentCommunication() {
-            return _state.canEndCurrentCommunication(this);
+            return _state.canEndCurrentCommunication();
         }
 
         /**
@@ -185,7 +203,29 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * @return true if this terminal is neither off neither busy, false otherwise.
          **/
         public boolean canStartCommunication() {
-            return _state.canStartCommunication(this);
+            return _state.canStartCommunication();
+        }
+
+        /**
+         * True if Terminal can receive a text communication, that is
+         * if it isn't off or busy (with an active communication)
+         *  
+         * @return true if Terminal can receive a text communication
+         */
+        public boolean canReceiveTextCommunication() {
+            return _state.canReceiveTextCommunication();
+        }
+
+        public boolean canReceiveInteractiveCommunication() {
+            return _state.canReceiveInteractiveCommunication();
+        }
+
+        
+        public void sendTextCommunication(Terminal origin, String text) throws 
+                                                        UnavailableTerminalException {
+        }
+
+        public void sentInteractiveCommunication(Terminal origin) {
         }
 
         /**

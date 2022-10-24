@@ -2,7 +2,7 @@ package prr.communications;
 
 import prr.terminals.Terminal;
 
-public abstract class Communication {
+public abstract class Communication implements Comparable<Communication> {
     /** Static counter of total Communications on the Network */
     private static Integer _count = 0;
 
@@ -24,6 +24,8 @@ public abstract class Communication {
     /** Text chars or duration units */
     protected Integer _units;
 
+    protected Integer _price;
+
     /**
      * 
      * @param sender Terminal starting the communication
@@ -43,6 +45,8 @@ public abstract class Communication {
 
     public Terminal getReciever() { return _receiver; }
 
+    public Integer getPrice() { return _price; }
+
     public boolean isFinished() { return _finished; }
 
     public boolean isPaid() { return _paid; }
@@ -55,6 +59,22 @@ public abstract class Communication {
 
     public void setUnits(Integer units) { _units = units; }
 
+    public void setPrice(Integer price) { _price = price; } 
+
+    @Override
+    public int compareTo(Communication c) {
+        return _number - c.getNumber();
+    }
+
     // TODO - calculatePrice...
+    public String toString() {
+        return "TEXT|" +
+            _number + "|" +
+            _sender.getKey() + "|" +
+            _receiver.getKey() + "|" +
+            _units + "|" +
+            _price + "|" +
+            (_finished ? "FINISHED" : "ONGOING");
+    }
     
 }

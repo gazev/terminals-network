@@ -16,6 +16,8 @@ class DoShowClientsWithoutDebts extends Command<Network> {
 
 	@Override
 	protected final void execute() throws CommandException {
-                //FIXME implement command
+		_receiver.getAllClients().stream()
+		                         .filter(c -> c.getClientDebtBalance() == 0)
+								 .forEach(_display::popup);
 	}
 }

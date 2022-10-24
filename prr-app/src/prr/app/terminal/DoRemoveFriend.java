@@ -1,9 +1,11 @@
 package prr.app.terminal;
 
+import javax.lang.model.element.UnknownAnnotationValueException;
+
 import prr.Network;
+import prr.app.exceptions.UnknownTerminalKeyException;
 import prr.terminals.Terminal;
 import pt.tecnico.uilib.menus.CommandException;
-//FIXME add more imports if needed
 
 /**
  * Remove friend.
@@ -12,11 +14,15 @@ class DoRemoveFriend extends TerminalCommand {
 
 	DoRemoveFriend(Network context, Terminal terminal) {
 		super(Label.REMOVE_FRIEND, context, terminal);
-		//FIXME add command fields
+		addStringField("key", Prompt.terminalKey());
 	}
 
 	@Override
 	protected final void execute() throws CommandException {
-                //FIXME implement command
+		try {
+			_receiver.removeFriend(_network.getTerminalByKey(stringField("key")));
+		} catch (prr.exceptions.UnknownTerminalKeyException e) {
+			throw new UnknownTerminalKeyException(e.getKey());
+		}
 	}
 }

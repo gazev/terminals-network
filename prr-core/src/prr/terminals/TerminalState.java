@@ -8,9 +8,8 @@ public interface TerminalState {
      * @param context Terminal
      * @return boolean
      */
-    public boolean canEndCurrentCommunication(Terminal context);
+    public boolean canEndCurrentCommunication();
 
-    // TODO
     
     /**
      * Returns true if Terminal can start a new interactive
@@ -20,5 +19,11 @@ public interface TerminalState {
      * 
      * @return boolean
      */
-    public boolean canStartCommunication(Terminal context);
+    public boolean canStartCommunication();
+
+    
+    public boolean canReceiveTextCommunication();
+    public boolean canReceiveInteractiveCommunication();
+
+    public void changeTerminalState(Terminal context, TerminalState state);
 }
