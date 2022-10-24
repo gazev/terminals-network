@@ -11,7 +11,7 @@ install:
 	(cd prr-app; make $(MFLAGS) install)
 
 run:
-	java -cp $(CLASSPATH) -Dimport=file.import prr.app.App
+	java -cp $(CLASSPATH)  prr.app.App
 
 test:
 	@./runtests.sh $(CLASSPATH) tests
