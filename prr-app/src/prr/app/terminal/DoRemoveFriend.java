@@ -20,7 +20,7 @@ class DoRemoveFriend extends TerminalCommand {
 	@Override
 	protected final void execute() throws CommandException {
 		try {
-			_receiver.removeFriend(_network.getTerminalByKey(stringField("key")));
+			_receiver.removeFriend(stringField("key"), _network);
 		} catch (prr.exceptions.UnknownTerminalKeyException e) {
 			throw new UnknownTerminalKeyException(e.getKey());
 		}

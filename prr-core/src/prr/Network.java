@@ -411,14 +411,11 @@ public class Network implements Serializable {
         try {
             Terminal t = getTerminalByKey(fields[1]);
             for(String s : friends)
-                t.addFriend(getTerminalByKey(s));
+                t.addFriend(s, this);
         } catch (UnknownTerminalKeyException e) {
             throw new IllegalEntryException(e.getKey());
         }
     }
-
-
-
 
 
     public void registerTerminalFromImport(String terminalKey, String type, String ownerKey, 

@@ -21,9 +21,9 @@ class DoSendTextCommunication extends TerminalCommand {
         @Override
         protected final void execute() throws CommandException {
                 try {
-                        _receiver.sendTextCommunication(_network.getTerminalByKey(
-                                                        stringField("originKey")),
-                                                                stringField("text"));
+                        _receiver.sendTextCommunication(
+                                        stringField("originKey"),
+                                                stringField("text"), _network);
                 } catch (prr.exceptions.UnavailableTerminalException e1) {
                         _display.popup(Message.destinationIsOff(e1.getKey()));
                 } catch (prr.exceptions.UnknownTerminalKeyException e2) {

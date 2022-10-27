@@ -24,7 +24,7 @@ public abstract class Communication implements Comparable<Communication> {
     /** Text chars or duration units */
     protected Integer _units;
 
-    protected Integer _price;
+    protected Double _price;
 
     /**
      * 
@@ -45,7 +45,7 @@ public abstract class Communication implements Comparable<Communication> {
 
     public Terminal getReciever() { return _receiver; }
 
-    public Integer getPrice() { return _price; }
+    public Double getPrice() { return _price; }
 
     public boolean isFinished() { return _finished; }
 
@@ -59,7 +59,9 @@ public abstract class Communication implements Comparable<Communication> {
 
     public void setUnits(Integer units) { _units = units; }
 
-    public void setPrice(Integer price) { _price = price; } 
+    public void setPrice(Double price) { _price = price; } 
+
+    // public abstract Integer determinePrice(TariffPlan tp);
 
     @Override
     public int compareTo(Communication c) {

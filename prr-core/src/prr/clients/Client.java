@@ -30,6 +30,8 @@ public class Client implements Serializable {
     /** Client's type */
     ClientType _type;
 
+    // TariffPlan _tariffPlan = new BaseTariffPlan();
+
     /** Map of this Client's Terminals and their respective keys */
     Map<String, Terminal> _terminals = new TreeMap<>();
 

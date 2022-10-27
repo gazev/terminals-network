@@ -1,19 +1,21 @@
 package prr.terminals;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import prr.Network;
 import prr.clients.Client;
 import prr.communications.Communication;
+import prr.communications.InteractiveCommunication;
 import prr.exceptions.NoActiveCommunication;
 import prr.exceptions.SameTerminalStateException;
-import prr.exceptions.UnavailableFileException;
 import prr.exceptions.UnavailableTerminalException;
+import prr.exceptions.UnsupportedOperationException;
 
 /**
  * Abstract terminal.
@@ -24,17 +26,17 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 	private static final long serialVersionUID = 202208091753L;
 
         /** Terminal identifying key */
-        private String _key;
+        protected String _key;
 
         /** Client that owns this Terminal */
-        private Client _owner;
+        protected Client _owner;
 
         protected Integer _paidBalance = 0;
 
         protected Integer _debtBalance = 0;
 
         /** Current ongoing communication */
-        protected Communication _activeCommunication;
+        protected InteractiveCommunication _activeCommunication;
 
         /** List of Clients that are awaiting this Terminal State update */
         protected List<Client> _clientObservers = new ArrayList<>();
@@ -97,12 +99,18 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         public TerminalState getTerminalState() { return _state; }
 
+        public Map<String, Terminal> getFriends() { return _friends; }
+
         /**
          * Returns current Terminal's state
          * 
          * @return Terminal's state
          */
         public TerminalState getState() { return _state; }
+
+        public void setActiveCommunication(InteractiveCommunication c) {
+            _activeCommunication = c;
+        }
 
         public void setTerminalState(TerminalState state) { _state = state; }
 
@@ -135,33 +143,50 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             return _activeCommunication;
         }
 
-        /**
-         * Adds given Terminal to Terminal's friend list
-         *
-         * @param t Terminal to be added to the Friends list
-         */
-        public void addFriend(Terminal terminal) {
-            // if Terminal already in friends list
-            if(isFriend(terminal)) {
+        public void addFriend(String key, Network context) 
+                                    throws prr.exceptions.UnknownTerminalKeyException {
+            Terminal t = context.getTerminalByKey(key);
+
+            // if trying to add Terminal to its own friends
+            if(key.equals(_key)) {
                 return;
             }
-            _friends.put(terminal.getKey(), terminal);
+            // if terminal is already a friend
+            if(isFriend(t)) {
+                return;
+            }
+
+            // add to friends list
+            _friends.put(t.getKey(), t);
             // add this Terminal to other Terminal's friend list
-            terminal.addFriend(this);
+            t.getFriends().put(_key, this);
         }
 
         /**
-         * Removes given Terminal from Terminal's friend list
          * 
-         * @param terminal Terminal to be removed from Friends list
+         * @param key Key of Terminal to be removed from Terminals Friends
+         * @param context The network context
+         * @throws prr.exceptions.UnknownTerminalKeyException If Terminal with
+         *                                                    specified key doesn't exist
          */
-        public void removeFriend(Terminal terminal) {
-            if(!isFriend(terminal)) {
+        public void removeFriend(String key, Network context) 
+                                        throws prr.exceptions.UnknownTerminalKeyException {
+            Terminal t = context.getTerminalByKey(key);
+            
+            // if trying to remove same Terminal from its friends list
+            if(key.equals(_key)) {
                 return;
             }
-            _friends.remove(terminal.getKey());
-            // remove this Terminal from other's Terinal friends list
-            terminal.removeFriend(this);
+
+            // if Terminal is not a friend 
+            if(!isFriend(t)) {
+                return;
+            }
+
+            // remove Terminal from friends 
+            _friends.remove(t.getKey());
+            // remove this Terminal from other Terminal friends
+            t.getFriends().remove(_key);
         }
 
         /**
@@ -216,18 +241,16 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             return _state.canReceiveTextCommunication();
         }
 
-        public boolean canReceiveInteractiveCommunication() {
-            return _state.canReceiveInteractiveCommunication();
-        }
+        public abstract boolean canReceiveInteractiveCommunication(String commType) 
+                    throws UnsupportedOperationException;
 
-        
-        public void sendTextCommunication(Terminal origin, String text) throws 
-                                                        UnavailableTerminalException {
-        }
 
-        public void sentInteractiveCommunication(Terminal origin) {
-        }
+        public abstract void sendTextCommunication(String key, String text, Network context)
+                    throws UnavailableTerminalException, prr.exceptions.UnknownTerminalKeyException;
 
+        public abstract void sendInteractiveCommunication(String key, String commType, Network context) 
+                    throws UnavailableTerminalException, prr.exceptions.UnknownTerminalKeyException,
+                        prr.exceptions.UnsupportedOperationException;
         /**
          * Returns String representation of the Terminal
          * 
