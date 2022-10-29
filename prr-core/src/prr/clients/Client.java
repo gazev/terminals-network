@@ -19,27 +19,30 @@ public class Client implements Serializable {
 	private static final long serialVersionUID = 202208091753L;
 
     /** Client's key */
-    String _key;
+    private String _key;
 
     /** Client's name */
-    String _name;
+    private String _name;
 
     /** Client's tax ID */
-    int _taxId;
+    private int _taxId;
 
     /** Client's type */
-    ClientType _type;
+    private ClientType _type;
 
     // TariffPlan _tariffPlan = new BaseTariffPlan();
 
     /** Map of this Client's Terminals and their respective keys */
-    Map<String, Terminal> _terminals = new TreeMap<>();
+    private Map<String, Terminal> _terminals = new TreeMap<>();
 
     /** Client's notifications not yet delivered */
-    Queue<Notification> _notificationsLog = new LinkedList<>();
+    private Queue<Notification> _notificationsLog = new LinkedList<>();
 
     /** Flag to determine if Client should be notified */
-    boolean _notificationsOn = true;
+    private boolean _notificationsOn = true;
+
+    /** Base TariffPlan */
+    private TariffPlan _tariffPlan = new BaseTariffPlan();
 
     /** Notification method, initialized with default NotificationMethod */
     NotificationMethod _notificationMethod = new NotificationMethod() {
@@ -106,6 +109,8 @@ public class Client implements Serializable {
     public ClientType getClientType() {
         return _type;
     }
+
+    public TariffPlan getTariffPlan() { return _tariffPlan; }
 
     public Collection<Terminal> getTerminals() {
         return _terminals.values();

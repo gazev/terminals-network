@@ -10,7 +10,9 @@ public abstract class InteractiveCommunication extends Communication {
         _price = 0.0;
         _units = 0;
     }
-
-    // public abstract boolean determinePrice(TariffPlan tp);
-    
+    public void setFinished() {
+        _finished = true; 
+        _sender.setActiveCommunication(null);
+        _receiver.setActiveCommunication(null);
+    }
 }

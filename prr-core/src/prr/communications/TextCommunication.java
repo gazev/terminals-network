@@ -1,6 +1,7 @@
 package prr.communications;
 
 import prr.clients.ClientType;
+import prr.clients.TariffPlan;
 import prr.terminals.Terminal;
 
 public class TextCommunication extends Communication {
@@ -17,14 +18,9 @@ public class TextCommunication extends Communication {
         _units = text.length();
     }
 
-    // public void determinePrice(TariffPlan tp, ClientType type) {
-    //     _price = tp.calculatePrice(this, _sender.getOwner().getClientType());
-    // }
-
-    // @Override
-    // public Integer determinePrice(prr.communications.TariffPlan tp) {
-    //     // TODO Auto-generated method stub
-    //     return null;
-    // }
+    @Override
+    public void determinePrice(TariffPlan tp, ClientType type) {
+        _price = tp.calculatePrice(this, type);
+    }
     
 }

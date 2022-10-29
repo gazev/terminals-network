@@ -253,7 +253,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                     throws UnavailableTerminalException, prr.exceptions.UnknownTerminalKeyException,
                         prr.exceptions.UnsupportedOperationException;
 
-        // public abstract void endInteractiveCommunication()
+        public abstract Integer endInteractiveCommunication(Integer duration);
         
         /**
          * Returns String representation of the Terminal

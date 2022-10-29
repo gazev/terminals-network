@@ -1,10 +1,12 @@
 package prr.communications;
 
+import prr.clients.ClientType;
+import prr.clients.TariffPlan;
 import prr.terminals.Terminal;
 
 public abstract class Communication implements Comparable<Communication> {
     /** Static counter of total Communications on the Network */
-    private static Integer _count = 0;
+    private static Integer _count = 1;
 
     /** Communication identifying integer */
     protected final Integer _number;
@@ -36,7 +38,6 @@ public abstract class Communication implements Comparable<Communication> {
        _sender = sender;
        _receiver = receiver; 
        _paid = false;
-       _price = 0.0;
     }
 
     // TODO
@@ -54,7 +55,6 @@ public abstract class Communication implements Comparable<Communication> {
 
     public Integer getUnits() { return _units; }
 
-    public void setFinished() { _finished = true; }
 
     public void setPaid() { _paid = true; }
 
@@ -62,14 +62,13 @@ public abstract class Communication implements Comparable<Communication> {
 
     public void setPrice(Double price) { _price = price; } 
 
-    // public abstract Integer determinePrice(TariffPlan tp);
+    public abstract void determinePrice(TariffPlan tp, ClientType type);
 
     @Override
     public int compareTo(Communication c) {
         return _number - c.getNumber();
     }
 
-    // TODO - calculatePrice...
     public String toString() {
         return "TEXT|" +
             _number + "|" +

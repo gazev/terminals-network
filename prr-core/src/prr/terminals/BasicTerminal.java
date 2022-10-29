@@ -42,8 +42,8 @@ public class BasicTerminal extends Terminal {
         // add to receiver Terminal's received communications
         destination.getReceivedCommunications().add(c);
         // determine the cost of the communication
-        // c.determinePrice(_owner.getTariffPlan(), _owner.getClientType());
-        
+        c.determinePrice(_owner.getTariffPlan(), _owner.getClientType());
+        _debtBalance += c.getPrice();
     }
 
     @Override
@@ -85,6 +85,26 @@ public class BasicTerminal extends Terminal {
         // set Terminals to busy
         this._state = new BusyTerminalState();
         destination.setTerminalState(new BusyTerminalState());
+    }
+
+    @Override
+    public Integer endInteractiveCommunication(Integer duration) {
+        // define units of interactive communication (duration)
+        _activeCommunication.setUnits(duration);
+
+        // calculate and set communication price
+        _activeCommunication.determinePrice(_owner.getTariffPlan(), _owner.getClientType());
+
+        // get price to return
+        Double price = _activeCommunication.getPrice();
+
+        // set communication as finished and remove references in sender and receiver terminal
+        _activeCommunication.setFinished();
+
+        // add to Terminal's debt
+        _debtBalance += price;
+
+        return (int) Math.round(price);
     }
 
     /**
