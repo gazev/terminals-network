@@ -12,7 +12,7 @@ import prr.Network;
 import prr.clients.Client;
 import prr.communications.Communication;
 import prr.communications.InteractiveCommunication;
-import prr.exceptions.NoActiveCommunication;
+import prr.exceptions.NoActiveCommunicationException;
 import prr.exceptions.SameTerminalStateException;
 import prr.exceptions.UnavailableTerminalException;
 import prr.exceptions.UnsupportedOperationException;
@@ -31,9 +31,9 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         /** Client that owns this Terminal */
         protected Client _owner;
 
-        protected Integer _paidBalance = 0;
+        protected Double _paidBalance = 0.0;
 
-        protected Integer _debtBalance = 0;
+        protected Double _debtBalance = 0.0;
 
         /** Current ongoing communication */
         protected InteractiveCommunication _activeCommunication;
@@ -88,14 +88,14 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * 
          * @return paid balance
          */
-        public Integer getPaidBalance() { return _paidBalance; }
+        public Double getPaidBalance() { return _paidBalance; }
 
         /**
          * Returns Terminal's total debt balance in Communication's prices
          * 
          * @return debt balance
          */
-        public Integer getDebtBalance() { return _debtBalance; }
+        public Double getDebtBalance() { return _debtBalance; }
 
         public TerminalState getTerminalState() { return _state; }
 
@@ -128,6 +128,8 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          */
         public List<Communication> getReceivedCommunications() { return _receivedCommunications; }
 
+        public List<Client> getClientsObserver() { return _clientObservers; }
+
         /**
          * Returns Terminal's currently active Communication
          *
@@ -135,11 +137,10 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          *
          * @throws NoActiveCommunication if there is not active communication
          */
-        public Communication getActiveCommunication() throws NoActiveCommunication {
-            // terminal doesn't have an active communication
-            if(_activeCommunication == null)
-                throw new NoActiveCommunication();
-
+        public Communication getActiveCommunication() throws NoActiveCommunicationException {
+            if(_activeCommunication == null) {
+                throw new NoActiveCommunicationException();
+            }
             return _activeCommunication;
         }
 
@@ -219,7 +220,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          *          it was the originator of this communication.
          **/
         public boolean canEndCurrentCommunication() {
-            return _state.canEndCurrentCommunication();
+            return _state.canEndCurrentCommunication(this);
         }
 
         /**
@@ -251,6 +252,9 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         public abstract void sendInteractiveCommunication(String key, String commType, Network context) 
                     throws UnavailableTerminalException, prr.exceptions.UnknownTerminalKeyException,
                         prr.exceptions.UnsupportedOperationException;
+
+        // public abstract void endInteractiveCommunication()
+        
         /**
          * Returns String representation of the Terminal
          * 
@@ -276,8 +280,8 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 _key + "|" +
                 _owner.getKey() + "|" +
                 _state + "|" +
-                _paidBalance + "|" +
-                _debtBalance +
+                (int) Math.round(_paidBalance) + "|" +
+                (int) Math.round(_debtBalance) +
                 (friendsString.isEmpty() ? "" : "|" + friendsString);
         }
 }

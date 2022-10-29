@@ -20,8 +20,7 @@ class DoShowCommunicationsFromClient extends Command<Network> {
 	protected final void execute() throws CommandException {
 		try {
 			_display.popup(_receiver.getCommunicationsStartedByClient(
-													_receiver.getClientByKey(
-														stringField("key"))));
+													_receiver.getClientByKey(stringField("key"))));
 		} catch (prr.exceptions.UnknownClientKeyException e) {
 			throw new UnknownClientKeyException(e.getKey());
 		}

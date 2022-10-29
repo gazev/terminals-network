@@ -29,10 +29,13 @@ public class BasicTerminal extends Terminal {
         if(key.equals(this.getKey())) {
             return;
         }
+
         // check if destination Terminal can receive a text communication
         if(!destination.canReceiveTextCommunication()) {
+            destination.getClientsObserver().add(_owner);
             throw new UnavailableTerminalException(destination.getKey(), destination.getState().toString());
         }
+        
         Communication c = new TextCommunication(this, destination, text);
         // add to this Terminal's sent communications
         this._sentCommunications.add(c);
@@ -68,6 +71,7 @@ public class BasicTerminal extends Terminal {
 
         // if destination can receive and interactive communication
         if(!destination.canReceiveInteractiveCommunication(commType)) {
+            destination.getClientsObserver().add(_owner);
             throw new UnavailableTerminalException(destination.getKey(), destination.getState().toString());
         }
         InteractiveCommunication c = new VoiceCommunication(this, destination);

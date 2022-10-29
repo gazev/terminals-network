@@ -23,8 +23,8 @@ class DoShowClientPaymentsAndDebts extends Command<Network> {
 			Client c = _receiver.getClientByKey(stringField("key"));
 			_display.popup(Message.clientPaymentsAndDebts(
 				stringField("key"), 
-					c.getClientPaidBalance(), 
-						c.getClientDebtBalance()));
+					(int) Math.round(c.getClientPaidBalance()), 
+						(int) Math.round(c.getClientDebtBalance())));
 		} catch (prr.exceptions.UnknownClientKeyException e) {
 			throw new UnknownClientKeyException(stringField("key"));
 		}	

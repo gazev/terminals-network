@@ -3,7 +3,7 @@ package prr.terminals;
 import java.io.Serial;
 import java.io.Serializable;
 
-import prr.exceptions.NoActiveCommunication;
+import prr.exceptions.NoActiveCommunicationException;
 
 public class BusyTerminalState implements TerminalState, Serializable {
     @Serial
@@ -12,8 +12,13 @@ public class BusyTerminalState implements TerminalState, Serializable {
 
     /** @see prr.terminals.TerminalState#canEndCurrentCommunication(Terminal) */
     @Override
-    public boolean canEndCurrentCommunication() {
-        return true;
+    public boolean canEndCurrentCommunication(Terminal context) {
+        try {
+            return context.getActiveCommunication().getSender().equals(context);
+        } catch (NoActiveCommunicationException e) {
+            // never happens
+            return false;
+        }
     }
 
     // TODO

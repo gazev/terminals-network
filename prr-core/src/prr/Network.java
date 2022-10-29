@@ -101,6 +101,15 @@ public class Network implements Serializable {
         setDirty();
     }
 
+    public Double getGlobalBalance() {
+        Double sum = 0.0;
+        for(Client c : getAllClients()) {
+            sum += c.getClientPaidBalance() - c.getClientDebtBalance(); 
+        }
+
+        return sum;
+    }
+
     /**********************
      *  CLIENTS
      *********************/ 
@@ -217,22 +226,25 @@ public class Network implements Serializable {
      * @return Stream of Terminals that haven't started or received any
      *         communications
      */
-	public Stream<Terminal> getUnusedTerminals(){
-        // TODO explain and keep/remove for final version based on everyone's understanding
-        return _terminals.values().stream()
-                                  .filter(t -> 
-                                    t.getReceivedCommunications().size() == 0 &&
-                                        t.getStartedCommunications().size() == 0);
-
-		//List<Terminal> termAux = new ArrayList<>();
-		//for(Terminal t : _terminals.values()){
-		//	if(t.getReceivedCommunications().size() == 0 &&
-		//			            t.getStartedCommunications().size() == 0 ){
-		//			termAux.add(t);
-		//	}
-		//}
-		//return termAux;
+	public Collection<Terminal> getUnusedTerminals() {
+		List<Terminal> termAux = new ArrayList<>();
+		for(Terminal t : _terminals.values()){
+			if(t.getReceivedCommunications().size() == 0 &&
+					            t.getStartedCommunications().size() == 0 ){
+					termAux.add(t);
+			}
+		}
+		return termAux;
 	}
+
+    public Collection<Terminal> getTerminalsWithPositiveBalance() {
+        List<Terminal> termAux = new ArrayList<>();
+        for(Terminal t : _terminals.values()) {
+            if(t.getPaidBalance() > t.getDebtBalance())
+                termAux.add(t);
+        }
+    return termAux;
+    }
 
     public Collection<Communication> getAllCommunications() {
         List<Communication> comms = new ArrayList<>();
@@ -250,6 +262,16 @@ public class Network implements Serializable {
         List<Communication> comms = new ArrayList<>();
         for(Terminal t : client.getTerminals()) {
             comms.addAll(t.getStartedCommunications());
+        }
+        Collections.sort(comms);
+
+        return comms;
+    }
+
+    public Collection<Communication> getCommunicationsReceivedByClient(Client client) {
+        List<Communication> comms = new ArrayList<>();
+        for(Terminal t : client.getTerminals()) {
+            comms.addAll(t.getReceivedCommunications());
         }
         Collections.sort(comms);
 

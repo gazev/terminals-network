@@ -36,6 +36,7 @@ public abstract class Communication implements Comparable<Communication> {
        _sender = sender;
        _receiver = receiver; 
        _paid = false;
+       _price = 0.0;
     }
 
     // TODO
@@ -75,7 +76,7 @@ public abstract class Communication implements Comparable<Communication> {
             _sender.getKey() + "|" +
             _receiver.getKey() + "|" +
             _units + "|" +
-            _price + "|" +
+            (int) Math.round(_price) + "|" +
             (_finished ? "FINISHED" : "ONGOING");
     }
     

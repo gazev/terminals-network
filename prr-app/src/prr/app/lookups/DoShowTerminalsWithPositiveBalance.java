@@ -16,8 +16,6 @@ class DoShowTerminalsWithPositiveBalance extends Command<Network> {
 
 	@Override
 	protected final void execute() throws CommandException {
-		_receiver.getAllTerminals().stream()
-		                           .filter(t -> t.getPaidBalance() > t.getDebtBalance())
-								   .forEach(_display::popup);
+		_display.popup(_receiver.getTerminalsWithPositiveBalance());
 	}
 }

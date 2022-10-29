@@ -1,6 +1,5 @@
 package prr.communications;
 
-import prr.clients.TariffPlan;
 import prr.clients.ClientType;
 import prr.terminals.Terminal;
 
@@ -18,9 +17,9 @@ public class TextCommunication extends Communication {
         _units = text.length();
     }
 
-    public void determinePrice(TariffPlan tp, ClientType type) {
-        _price = tp.calculatePrice(this, _sender.getOwner().getClientType());
-    }
+    // public void determinePrice(TariffPlan tp, ClientType type) {
+    //     _price = tp.calculatePrice(this, _sender.getOwner().getClientType());
+    // }
 
     // @Override
     // public Integer determinePrice(prr.communications.TariffPlan tp) {

@@ -10,7 +10,7 @@ public class OffTerminalState implements TerminalState, Serializable {
     
     /** @see prr.terminals.TerminalState#canEndCurrentCommunication(Terminal) */
     @Override
-    public boolean canEndCurrentCommunication() {
+    public boolean canEndCurrentCommunication(Terminal context) {
         return false;
     }
 

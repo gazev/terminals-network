@@ -3,8 +3,6 @@ package prr.terminals;
 import java.io.Serial;
 import java.io.Serializable;
 
-import prr.exceptions.NoActiveCommunication;
-
 public class OnTerminalState implements TerminalState, Serializable {
     @Serial
     /** Serial number for serialization. */
@@ -12,7 +10,7 @@ public class OnTerminalState implements TerminalState, Serializable {
 
     /** @see prr.terminals.TerminalState#canEndCurrentCommunication(Terminal) */
     @Override
-    public boolean canEndCurrentCommunication() {
+    public boolean canEndCurrentCommunication(Terminal context) {
         return false;
     }
 

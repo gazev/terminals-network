@@ -134,11 +134,12 @@ public class Client implements Serializable {
      * @return Client's debt balance
      * 
      */
-    public Integer getClientDebtBalance() {
-        // TODO explain and keep/remove for final version based on everyone's understanding 
-        return _terminals.values().stream()
-                                  .mapToInt(Terminal::getDebtBalance)//(t -> t.getDebtBalance())
-                                  .sum();
+    public Double getClientDebtBalance() {
+        Double sum = 0.0;
+        for(Terminal t : getTerminals()) 
+            sum += t.getDebtBalance();
+
+        return sum;
     }
 
     /** 
@@ -147,11 +148,12 @@ public class Client implements Serializable {
      * 
      * @reutrn Client's paid balance
      */
-    public Integer getClientPaidBalance() {
-        // TODO explain and keep/remove for final version based on everyone's understanding 
-        return _terminals.values().stream() 
-                                  .mapToInt(Terminal::getPaidBalance)//(t -> t.getPaidBalance())
-                                  .sum();
+    public Double getClientPaidBalance() {
+        Double sum = 0.0;
+        for(Terminal t : getTerminals())
+            sum += t.getPaidBalance();
+
+        return sum;
     }
 
     /**
@@ -208,7 +210,7 @@ public class Client implements Serializable {
                 _type + "|" + 
                 (notificationsOn() ? "YES" : "NO") + "|" +
                 _terminals.size() + "|" + 
-                getClientDebtBalance() + "|" +
-                getClientPaidBalance(); 
+                (int) Math.round(getClientDebtBalance()) + "|" +
+                (int) Math.round(getClientPaidBalance()); 
     }
 }
