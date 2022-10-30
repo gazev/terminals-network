@@ -12,6 +12,7 @@ import prr.Network;
 import prr.clients.Client;
 import prr.communications.Communication;
 import prr.communications.InteractiveCommunication;
+import prr.exceptions.InvalidCommunicationPaiment;
 import prr.exceptions.NoActiveCommunicationException;
 import prr.exceptions.SameTerminalStateException;
 import prr.exceptions.UnavailableTerminalException;
@@ -41,10 +42,10 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         /** List of Clients that are awaiting this Terminal State update */
         protected List<Client> _clientObservers = new ArrayList<>();
 
-        /** List of communications started by this Terminal */
+        /** List of communications received by this Terminal */
         protected List<Communication> _receivedCommunications = new ArrayList<>();
 
-        /** List of communications recieved by this Terminal */
+        /** List of communications started by this Terminal */
         protected List<Communication> _sentCommunications = new ArrayList<>();
 
         /** The current State of this Terminal */
@@ -54,7 +55,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         protected Map<String, Terminal> _friends = new TreeMap<>();
 
         /**
-         * 
+         *
          * @param key Terinal identifying key
          * @param owner Terminal's Client owner
          */
@@ -72,7 +73,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         /**
          * Returns Terminal's identifying key
-         * 
+         *
          * @return Terminal key
          */
         public String getKey() { return _key; }
@@ -85,14 +86,14 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         /**
          * Returns Terminal's total paid balance in Communication's prices
-         * 
+         *
          * @return paid balance
          */
         public Double getPaidBalance() { return _paidBalance; }
 
         /**
          * Returns Terminal's total debt balance in Communication's prices
-         * 
+         *
          * @return debt balance
          */
         public Double getDebtBalance() { return _debtBalance; }
@@ -103,7 +104,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         /**
          * Returns current Terminal's state
-         * 
+         *
          * @return Terminal's state
          */
         public TerminalState getState() { return _state; }
@@ -116,14 +117,14 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         /**
          * Returns a List of all Communications started by Terminal
-         * 
+         *
          * @return List of Communications started by this Terminal
          */
         public List<Communication> getStartedCommunications() { return _sentCommunications; }
 
         /**
          * Returns a List of all Communications received by Terminal
-         * 
+         *
          * @return List of Communications received by Terminal
          */
         public List<Communication> getReceivedCommunications() { return _receivedCommunications; }
@@ -144,7 +145,21 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             return _activeCommunication;
         }
 
-        public void addFriend(String key, Network context) 
+		public Communication getUnpaidCommunication(Integer id) throws InvalidCommunicationPaiment{
+			for(Communication c : _sentCommunications){
+				if(c.getNumber().equals(id)){
+					if(c.isFinished() && !c.isPaid()){
+						return c;
+					}
+					else{
+						break;
+					}
+				}
+			}
+			throw new InvalidCommunicationPaiment(id);
+		}
+
+        public void addFriend(String key, Network context)
                                     throws prr.exceptions.UnknownTerminalKeyException {
             Terminal t = context.getTerminalByKey(key);
 
@@ -164,35 +179,35 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         }
 
         /**
-         * 
+         *
          * @param key Key of Terminal to be removed from Terminals Friends
          * @param context The network context
          * @throws prr.exceptions.UnknownTerminalKeyException If Terminal with
          *                                                    specified key doesn't exist
          */
-        public void removeFriend(String key, Network context) 
+        public void removeFriend(String key, Network context)
                                         throws prr.exceptions.UnknownTerminalKeyException {
             Terminal t = context.getTerminalByKey(key);
-            
+
             // if trying to remove same Terminal from its friends list
             if(key.equals(_key)) {
                 return;
             }
 
-            // if Terminal is not a friend 
+            // if Terminal is not a friend
             if(!isFriend(t)) {
                 return;
             }
 
-            // remove Terminal from friends 
+            // remove Terminal from friends
             _friends.remove(t.getKey());
             // remove this Terminal from other Terminal friends
             t.getFriends().remove(_key);
         }
 
         /**
-         * Returns True if Terminal with given key is a 
-         * friend 
+         * Returns True if Terminal with given key is a
+         * friend
          *
          * @param key Terminal's key
          *
@@ -204,7 +219,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         }
 
 
-        public void changeTerminalState(TerminalState state) throws 
+        public void changeTerminalState(TerminalState state) throws
                                                         SameTerminalStateException {
             // if trying to change into the same state
             if(state.getClass().equals(_state.getClass())) {
@@ -212,6 +227,14 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             }
             _state.changeTerminalState(this, state);
         }
+
+		public void payCommunication(Integer idComm) throws InvalidCommunicationPaiment {
+			Communication c = getUnpaidCommunication(idComm);
+			//TODO
+
+		}
+
+
 
         /**
          * Checks if this terminal can end the current interactive communication.
@@ -235,35 +258,35 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         /**
          * True if Terminal can receive a text communication, that is
          * if it isn't off or busy (with an active communication)
-         *  
+         *
          * @return true if Terminal can receive a text communication
          */
         public boolean canReceiveTextCommunication() {
             return _state.canReceiveTextCommunication();
         }
 
-        public abstract boolean canReceiveInteractiveCommunication(String commType) 
+        public abstract boolean canReceiveInteractiveCommunication(String commType)
                     throws UnsupportedOperationException;
 
 
         public abstract void sendTextCommunication(String key, String text, Network context)
                     throws UnavailableTerminalException, prr.exceptions.UnknownTerminalKeyException;
 
-        public abstract void sendInteractiveCommunication(String key, String commType, Network context) 
+        public abstract void sendInteractiveCommunication(String key, String commType, Network context)
                     throws UnavailableTerminalException, prr.exceptions.UnknownTerminalKeyException,
                         prr.exceptions.UnsupportedOperationException;
 
         public abstract Integer endInteractiveCommunication(Integer duration);
-        
+
         /**
          * Returns String representation of the Terminal
-         * 
+         *
          * Formats:
          * <p>
          * {@code type|terminal-key|owner-key|state|debt|paid}
          * <p>
          * {@code type|terminal-key|owner-key|state|debt|paid|friend1,friend2,...,friendN}
-         * 
+         *
          * @see java.lang.Object#toString()
          */
         @Override
