@@ -3,7 +3,6 @@ package prr.terminals;
 import prr.Network;
 import prr.clients.Client;
 import prr.communications.Communication;
-import prr.communications.InteractiveCommunication;
 import prr.communications.TextCommunication;
 import prr.communications.VoiceCommunication;
 import prr.exceptions.UnavailableTerminalException;
@@ -42,8 +41,10 @@ public class BasicTerminal extends Terminal {
         // add to receiver Terminal's received communications
         destination.getReceivedCommunications().add(c);
         // determine the cost of the communication
-        c.determinePrice(_owner.getTariffPlan(), _owner.getClientType());
+        c.determinePrice(_owner.getClientType().getTariffTable());
         _debtBalance += c.getPrice();
+        // set context dirty
+        context.setDirty();
     }
 
     @Override
@@ -69,42 +70,16 @@ public class BasicTerminal extends Terminal {
             throw new prr.exceptions.UnsupportedOperationException(this.getKey());
         }
 
-        // if destination can receive and interactive communication
+        // if destination can receive an interactive communication
         if(!destination.canReceiveInteractiveCommunication(commType)) {
             destination.getClientsObserver().add(_owner);
             throw new UnavailableTerminalException(destination.getKey(), destination.getState().toString());
         }
-        InteractiveCommunication c = new VoiceCommunication(this, destination);
-        // add to Terminal's sent communications
-        this._sentCommunications.add(c);
-        // add to destination Terminal's received communications
-        destination.getReceivedCommunications().add(c);
-        // add current communication to active communications in both Terminals
-        this._activeCommunication = c;
-        destination.setActiveCommunication(c);
-        // set Terminals to busy
-        this._state = new BusyTerminalState();
-        destination.setTerminalState(new BusyTerminalState());
-    }
 
-    @Override
-    public Integer endInteractiveCommunication(Integer duration) {
-        // define units of interactive communication (duration)
-        _activeCommunication.setUnits(duration);
-
-        // calculate and set communication price
-        _activeCommunication.determinePrice(_owner.getTariffPlan(), _owner.getClientType());
-
-        // get price to return
-        Double price = _activeCommunication.getPrice();
-
-        // set communication as finished and remove references in sender and receiver terminal
-        _activeCommunication.setFinished();
-
-        // add to Terminal's debt
-        _debtBalance += price;
-
-        return (int) Math.round(price);
+        // create new communication
+        new VoiceCommunication(this, destination);
+        // set context dirty
+        context.setDirty();
     }
 
     /**

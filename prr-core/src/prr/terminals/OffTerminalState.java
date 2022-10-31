@@ -3,7 +3,7 @@ package prr.terminals;
 import java.io.Serial;
 import java.io.Serializable;
 
-public class OffTerminalState implements TerminalState, Serializable {
+public class OffTerminalState extends TerminalState implements Serializable {
     @Serial
     /** Serial number for serialization. */
 	private static final long serialVersionUID = 202208091753L;
@@ -30,13 +30,8 @@ public class OffTerminalState implements TerminalState, Serializable {
         return false;
     }
 
-    @Override
-    public void changeTerminalState(Terminal context, TerminalState state) {
-        // cannot change from off to busy 
-        if(state.getClass().equals(BusyTerminalState.class)) {
-            return;
-        }
-        context.setTerminalState(state);
+    public boolean SameType(OffTerminalState s) {
+        throw new AlreadyOffException();
     }
 
     /** @see java.lang.Object#toString() */

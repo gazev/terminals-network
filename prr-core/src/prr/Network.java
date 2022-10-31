@@ -3,20 +3,15 @@ package prr;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Stream;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
 import prr.clients.Client;
-import prr.clients.ClientType;
 import prr.terminals.TerminalState;
 import prr.terminals.BasicTerminal;
 import prr.terminals.BusyTerminalState;
@@ -30,9 +25,7 @@ import prr.exceptions.BadEntryException;
 import prr.exceptions.DuplicateClientKeyException;
 import prr.exceptions.DuplicateTerminalKeyException;
 import prr.exceptions.IllegalEntryException;
-import prr.exceptions.ImportFileException;
 import prr.exceptions.InvalidTerminalKeyException;
-import prr.exceptions.SameTerminalStateException;
 import prr.exceptions.UnknownClientKeyException;
 import prr.exceptions.UnknownTerminalKeyException;
 import prr.exceptions.UnrecognizedEntryException;
@@ -56,9 +49,6 @@ public class Network implements Serializable {
 
 	/** Map containing Terminals of this Network */
 	private Map<String, Terminal> _terminals = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-
-    /** List will all Communications of the Network */
-    private List<Communication> _communications = new ArrayList<>();
 
 	/**
 	 *

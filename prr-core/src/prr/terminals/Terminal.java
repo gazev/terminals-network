@@ -2,7 +2,6 @@ package prr.terminals;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +11,7 @@ import prr.Network;
 import prr.clients.Client;
 import prr.communications.Communication;
 import prr.communications.InteractiveCommunication;
+import prr.exceptions.InvalidCommunicationPayment;
 import prr.exceptions.NoActiveCommunicationException;
 import prr.exceptions.SameTerminalStateException;
 import prr.exceptions.UnavailableTerminalException;
@@ -46,6 +46,9 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         /** List of communications recieved by this Terminal */
         protected List<Communication> _sentCommunications = new ArrayList<>();
+
+        /** The current State of this Terminal */
+        protected TerminalState _stateBeforeBusy;
 
         /** The current State of this Terminal */
         protected TerminalState _state;
@@ -108,8 +111,14 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          */
         public TerminalState getState() { return _state; }
 
+        public TerminalState getStateBeforeBusy() { return _stateBeforeBusy; }
+
         public void setActiveCommunication(InteractiveCommunication c) {
             _activeCommunication = c;
+        }
+
+        public void setTerminalStateBeforeBusy(TerminalState state) {
+             _stateBeforeBusy = state; 
         }
 
         public void setTerminalState(TerminalState state) { _state = state; }
@@ -130,6 +139,19 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         public List<Client> getClientsObserver() { return _clientObservers; }
 
+        public Communication getUnpaidCommunicationById(Integer id) 
+                                            throws InvalidCommunicationPayment {
+			for(Communication c : _sentCommunications) {
+				if(c.getNumber().equals(id)) {
+					if(c.isFinished() && !c.isPaid()) {
+						return c;
+					} else {
+						break;
+					}
+				}
+			}
+			throw new InvalidCommunicationPayment(id);
+		}
         /**
          * Returns Terminal's currently active Communication
          *
@@ -204,12 +226,13 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         }
 
 
-        public void changeTerminalState(TerminalState state) throws 
+        public void changeTerminalState(TerminalState state, Network context) throws 
                                                         SameTerminalStateException {
-            // if trying to change into the same state
-            if(state.getClass().equals(_state.getClass())) {
-                throw new SameTerminalStateException();
-            }
+            _state.SameType(state);
+            
+            // set Network data as dirty
+            context.setDirty();
+
             _state.changeTerminalState(this, state);
         }
 
@@ -253,8 +276,39 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                     throws UnavailableTerminalException, prr.exceptions.UnknownTerminalKeyException,
                         prr.exceptions.UnsupportedOperationException;
 
-        public abstract Integer endInteractiveCommunication(Integer duration);
-        
+        public Integer endInteractiveCommunication(Integer duration, Network context) {
+            // define units of interactive communication (duration)
+            _activeCommunication.setUnits(duration);
+
+            // calculate and set communication price
+            _activeCommunication.determinePrice(_owner.getClientType().getTariffTable());
+
+            // get price to return
+            Double price = _activeCommunication.getPrice();
+            
+            // set communication as finished and remove references in sender and receiver terminal
+            _activeCommunication.setFinished();
+
+            // add to Terminal's debt
+            _debtBalance += price;
+
+            // flag Network data as dirty
+            context.setDirty();
+
+            return (int) Math.round(price);
+        }
+
+        public void payCommunication(Integer idComm, Network context) 
+                                        throws InvalidCommunicationPayment {
+			Communication c = getUnpaidCommunicationById(idComm);
+            _debtBalance -= c.getPrice();
+            _paidBalance += c.getPrice();
+            c.setPaid();
+
+            // flag Network data as dirty
+            context.setDirty();
+		}
+
         /**
          * Returns String representation of the Terminal
          * 

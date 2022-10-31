@@ -2,8 +2,6 @@ package prr.terminals;
 
 import prr.Network;
 import prr.clients.Client;
-import prr.communications.Communication;
-import prr.communications.InteractiveCommunication;
 import prr.communications.VideoCommunication;
 import prr.communications.VoiceCommunication;
 import prr.exceptions.UnknownTerminalKeyException;
@@ -35,18 +33,14 @@ public class FancyTerminal extends BasicTerminal {
             throw new UnavailableTerminalException(destination.getKey(), destination.getState().toString());
         }
 
-        InteractiveCommunication c = commType.equals("VOICE") ? 
-            new VoiceCommunication(this, destination) :
-                new VideoCommunication(this, destination); 
-        
-        this._sentCommunications.add(c);
-        destination.getReceivedCommunications().add(c);
-        // add
-        this._activeCommunication = c;
-        destination.setActiveCommunication(c);
-        // busy
-        this._state = new BusyTerminalState();
-        destination.setTerminalState(new BusyTerminalState());
+        // create communication
+        if(commType.equals("VOICE")) {
+            new VoiceCommunication(this, destination);
+        } else {
+            new VideoCommunication(this, destination);
+        }
+        // set context dirty
+        context.setDirty();
     }
 
     /** 

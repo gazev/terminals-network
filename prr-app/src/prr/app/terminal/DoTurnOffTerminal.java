@@ -18,7 +18,7 @@ class DoTurnOffTerminal extends TerminalCommand {
 	@Override
 	protected final void execute() throws CommandException {
 		try {
-			_receiver.changeTerminalState(new OffTerminalState());
+			_receiver.changeTerminalState(new OffTerminalState(), _network);
 		} catch (prr.exceptions.SameTerminalStateException e) {
 			_display.popup(Message.alreadyOff());
 		}

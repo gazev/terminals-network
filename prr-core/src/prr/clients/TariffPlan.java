@@ -1,12 +1,26 @@
 package prr.clients;
 
+import java.io.Serial;
+import java.io.Serializable;
 
-import prr.communications.TextCommunication;
-import prr.communications.VideoCommunication;
-import prr.communications.VoiceCommunication;
+public abstract class TariffPlan implements Serializable {
+    @Serial
+    /** Serial number for serialization. */
+	private static final long serialVersionUID = 202208091753L;
 
-public interface TariffPlan {
-    public abstract Double calculatePrice(TextCommunication c, ClientType type);
-    public abstract Double calculatePrice(VideoCommunication c, ClientType type);
-    public abstract Double calculatePrice(VoiceCommunication c, ClientType type);
+    protected TariffTable _normalTable;
+    protected TariffTable _goldTable;
+    protected TariffTable _platinumTable;
+
+    public TariffTable getNormalTable() {
+        return _normalTable;
+    }
+
+    public TariffTable getGoldTable() {
+        return _goldTable;
+    }
+
+    public TariffTable getPlatinumTable() {
+        return _platinumTable;
+    }
 }

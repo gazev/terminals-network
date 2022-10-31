@@ -1,6 +1,6 @@
 package prr.terminals;
 
-public interface TerminalState {
+public abstract class TerminalState {
     /**
      * Returns True if Terminal can end current ongoing Communication
      * and false elsewise
@@ -8,7 +8,7 @@ public interface TerminalState {
      * @param context Terminal
      * @return boolean
      */
-    public boolean canEndCurrentCommunication(Terminal context);
+    public abstract boolean canEndCurrentCommunication(Terminal context);
 
     
     /**
@@ -17,11 +17,18 @@ public interface TerminalState {
      * 
      * @return boolean
      */
-    public boolean canStartCommunication();
+    public abstract boolean canStartCommunication();
 
     
-    public boolean canReceiveTextCommunication();
-    public boolean canReceiveInteractiveCommunication();
+    public abstract boolean canReceiveTextCommunication();
+    public abstract boolean canReceiveInteractiveCommunication();
 
-    public void changeTerminalState(Terminal context, TerminalState state);
+    public void changeTerminalState(Terminal context, TerminalState state) {
+        context.setTerminalState(state);
+    }
+
+    /** Fallback function */
+    public boolean SameType(TerminalState state) {
+        return false;
+    }
 }

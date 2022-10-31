@@ -2,7 +2,6 @@ package prr.clients;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
@@ -75,7 +74,7 @@ public class Client implements Serializable {
         _key = key;
         _name = name;
         _taxId = taxId;
-        _type = new NormalType();
+        _type = new NormalType(this);
     }
 
     /**

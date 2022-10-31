@@ -3,7 +3,7 @@ package prr.terminals;
 import java.io.Serial;
 import java.io.Serializable;
 
-public class OnTerminalState implements TerminalState, Serializable {
+public class OnTerminalState extends TerminalState implements Serializable {
     @Serial
     /** Serial number for serialization. */
 	private static final long serialVersionUID = 202208091753L;
@@ -32,11 +32,10 @@ public class OnTerminalState implements TerminalState, Serializable {
         return true;
     }
 
-    @Override
-    public void changeTerminalState(Terminal context, TerminalState state) {
-        context.setTerminalState(state);
+    public boolean SameType(OnTerminalState s) {
+        return true;
     }
-
+    
     /** @see java.lang.Object#toString() */
     @Override
     public String toString() {

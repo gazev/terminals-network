@@ -20,6 +20,6 @@ class DoShowTerminalBalance extends TerminalCommand {
 		_display.popup(
 			Message.terminalPaymentsAndDebts(_receiver.getKey(), 
 												(int) Math.round(_receiver.getPaidBalance()), 
-													(int) Math.round(_receiver.getPaidBalance())));
+													(int) Math.round(_receiver.getDebtBalance())));
 	}
 }

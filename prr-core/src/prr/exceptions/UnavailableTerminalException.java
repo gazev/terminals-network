@@ -2,8 +2,6 @@ package prr.exceptions;
 
 import java.io.Serial;
 
-import prr.terminals.TerminalState;
-
 /**
  * Exception thrown when a communication cannot be sent to a Terminal 
  */

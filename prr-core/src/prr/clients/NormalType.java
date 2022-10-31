@@ -3,12 +3,14 @@ package prr.clients;
 import java.io.Serial;
 import java.io.Serializable;
 
-public class NormalType implements ClientType, Serializable {
+public class NormalType extends ClientType implements Serializable {
     @Serial
     /** Serial number for serialization. */
 	private static final long serialVersionUID = 202208091753L;
 
-    // TODO
+    public NormalType(Client context) {
+        _tariffTable = context.getTariffPlan().getNormalTable();
+    }
 
     /** @see java.lang.Object#toString() */
     @Override

@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 import prr.exceptions.NoActiveCommunicationException;
 
-public class BusyTerminalState implements TerminalState, Serializable {
+public class BusyTerminalState extends TerminalState implements Serializable {
     @Serial
     /** Serial number for serialization. */
 	private static final long serialVersionUID = 202208091753L;
@@ -41,11 +41,12 @@ public class BusyTerminalState implements TerminalState, Serializable {
 
     @Override
     public void changeTerminalState(Terminal context, TerminalState state) {
-        // cannot change from busy to off
-        if(state.getClass().equals(OffTerminalState.class)) {
-            return;
-        }
-        context.setTerminalState(state);
+        // terminal state cannot be changed if it is busy (only on end of a communication)
+        return;
+    }
+
+    public boolean SameType(BusyTerminalState s) {
+        return true;
     }
 
     /** @see java.lang.Object#toString() */
