@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
+import java.util.List;
+import java.util.ArrayList;
 
 import prr.terminals.Terminal;
 
@@ -45,27 +47,37 @@ public class Client implements Serializable {
 
     /** Notification method, initialized with default NotificationMethod */
     NotificationMethod _notificationMethod = new NotificationMethod() {
-        // TODO
-        // NOT YET CONCEPTUALIZED
 
         @Serial
         /** Serial number for serialization. */
 	    private static final long serialVersionUID = 202208091753L;
 
         /** The default Notification Method currently does not perform any relevant action */
-        public void deliverNotifications() {
-            // EMPTY (for now)
+        public void deliverNotifications(String notificationType, String terminalKey) {
+			Notification n = new Notification(terminalKey, notificationType);
+			_notificationsLog.add(n);
         }
-    }; 
+    };
 
     /** Notificaitons that Clients receive */
     public class Notification {
-        public Notification() {}
-        // TODO
+		private String _terminalSenderKey;
+
+		private String _notificationType;
+
+        public Notification(String terminalSenderKey, String notificationType) {
+			_terminalSenderKey = terminalSenderKey;
+			_notificationType = notificationType;
+		}
+
+		public String toString(){
+			return _notificationType + "|" + _terminalSenderKey;
+		}
     }
-    
+
+
     /**
-     * 
+     *
      * @param key Client's identifying key
      * @param name Client's name
      * @param taxId Client's tax ID
@@ -78,7 +90,7 @@ public class Client implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return Client's identifying key
      */
     public String getKey() {
@@ -86,7 +98,7 @@ public class Client implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return Client's name
      */
     public String getName() {
@@ -94,7 +106,7 @@ public class Client implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return Client's Tax Id
      */
     public int getTaxId() {
@@ -102,7 +114,7 @@ public class Client implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return Client's type
      */
     public ClientType getClientType() {
@@ -116,40 +128,43 @@ public class Client implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return Client's notification flag
      */
     public boolean notificationsOn() {
         return _notificationsOn;
     }
-    
+
     /**
-     * 
-     * @return number of Terminals owned by the Client 
+     *
+     * @return number of Terminals owned by the Client
      */
     public Integer getNumberOfTerminals() {
         return _terminals.size();
     }
 
+	public NotificationMethod getNotificationMethod(){ return _notificationMethod; }
+
+
     /**
      * Returns this Client's balance in debt by checking each of his Terminal's
      * debt balance.
-     * 
+     *
      * @return Client's debt balance
-     * 
+     *
      */
     public Double getClientDebtBalance() {
         Double sum = 0.0;
-        for(Terminal t : getTerminals()) 
+        for(Terminal t : getTerminals())
             sum += t.getDebtBalance();
 
         return sum;
     }
 
-    /** 
+    /**
      * Returns this Client's balance paid by checking each of his Terminal's
      * paid balance.
-     * 
+     *
      * @reutrn Client's paid balance
      */
     public Double getClientPaidBalance() {
@@ -160,9 +175,17 @@ public class Client implements Serializable {
         return sum;
     }
 
+	public Collection<Notification> getUnhandledNotification(){
+		List<Notification> aux = new ArrayList<>();
+		while(!_notificationsLog.isEmpty()){
+			aux.add(_notificationsLog.remove());
+		}
+		return aux;
+	}
+
     /**
      * Sets notifications flag to given boolean
-     * 
+     *
      * @param notificationsOn true if Client whishes to get notified and false elsewise
      */
     public void setNotificationsOn(boolean notificationsOn) {
@@ -171,14 +194,14 @@ public class Client implements Serializable {
 
     /**
      * Sets Client's Type to given Type
-     * 
+     *
      * @param type new Client's Type
      */
     public void setClientType(ClientType type) {
         _type = type;
     }
 
-    /** 
+    /**
      * Deliver Client notification using current Client's Notification Method
      */
     public void doNotify() {
@@ -186,9 +209,9 @@ public class Client implements Serializable {
     }
 
     /**
-     * Adds given Terminal to the Client's owned Terminals 
-     * 
-     * @param terminal Terminal to be added to user's owned Terminals 
+     * Adds given Terminal to the Client's owned Terminals
+     *
+     * @param terminal Terminal to be added to user's owned Terminals
      */
     public void addTerminal(Terminal terminal) {
         _terminals.put(terminal.getKey(), terminal);
@@ -196,25 +219,25 @@ public class Client implements Serializable {
 
     /**
      * Returns a string that represents this Client
-     * 
+     *
      * Format:
      * <p>
      * {@code CLIENT|key|name|taxId|type|NOTIFICATIONS|nr-terminals|debt|paid}
      * <p>
      * NOTIFICATIONS is either YES or NO depending if Client whishes to be notified
-     * 
-     * @see java.lang.Object#toString() 
+     *
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return "CLIENT|" + 
-                _key + "|" + 
+        return "CLIENT|" +
+                _key + "|" +
                 _name + "|" +
-                _taxId + "|" + 
-                _type + "|" + 
+                _taxId + "|" +
+                _type + "|" +
                 (notificationsOn() ? "YES" : "NO") + "|" +
-                _terminals.size() + "|" + 
+                _terminals.size() + "|" +
                 (int) Math.round(getClientDebtBalance()) + "|" +
-                (int) Math.round(getClientPaidBalance()); 
+                (int) Math.round(getClientPaidBalance());
     }
 }

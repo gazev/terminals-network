@@ -20,7 +20,7 @@ public class BasicTerminal extends Terminal {
 
     @Override
     public void sendTextCommunication(String key, String text, Network context) throws
-                                                    UnavailableTerminalException, 
+                                                    UnavailableTerminalException,
                                                         prr.exceptions.UnknownTerminalKeyException {
         Terminal destination = context.getTerminalByKey(key);
 
@@ -31,10 +31,12 @@ public class BasicTerminal extends Terminal {
 
         // check if destination Terminal can receive a text communication
         if(!destination.canReceiveTextCommunication()) {
-            destination.getClientsObserver().add(_owner);
+			if(_owner.notificationsOn()){
+				destination.getClientsObserver().add(_owner);
+			}
             throw new UnavailableTerminalException(destination.getKey(), destination.getState());
         }
-        
+
         Communication c = new TextCommunication(this, destination, text);
         // add to this Terminal's sent communications
         this._sentCommunications.add(c);
@@ -48,7 +50,7 @@ public class BasicTerminal extends Terminal {
     }
 
     @Override
-    public boolean canReceiveInteractiveCommunication(String commType) 
+    public boolean canReceiveInteractiveCommunication(String commType)
                                     throws prr.exceptions.UnsupportedOperationException {
         // basic Terminal cannot perform Video Communications
         if(commType.equals("VIDEO")) {
@@ -59,7 +61,7 @@ public class BasicTerminal extends Terminal {
     }
 
     @Override
-    public void sendInteractiveCommunication(String key, String commType, Network context) 
+    public void sendInteractiveCommunication(String key, String commType, Network context)
                                 throws UnavailableTerminalException, UnknownTerminalKeyException,
                                     prr.exceptions.UnsupportedOperationException {
         // get destionation Terminal
@@ -72,7 +74,9 @@ public class BasicTerminal extends Terminal {
 
         // if destination can receive an interactive communication
         if(!destination.canReceiveInteractiveCommunication(commType)) {
-            destination.getClientsObserver().add(_owner);
+			if(_owner.notificationsOn()){
+				destination.getClientsObserver().add(_owner);
+			}
             throw new UnavailableTerminalException(destination.getKey(), destination.getState());
         }
 

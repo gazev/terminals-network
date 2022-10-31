@@ -28,7 +28,7 @@ public class BusyTerminalState extends TerminalState implements Serializable {
     public boolean canStartCommunication() {
         return false;
     }
-    
+
     @Override
     public boolean canReceiveTextCommunication() {
         return true;
@@ -41,6 +41,9 @@ public class BusyTerminalState extends TerminalState implements Serializable {
 
     @Override
     public void changeTerminalState(Terminal context, TerminalState state) {
+		if(state.isIdle()){
+			context.doNotify("B2I", context.getKey());
+		}
         context.setTerminalState(state);
    }
 

@@ -38,7 +38,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         /** Current ongoing communication */
         protected InteractiveCommunication _activeCommunication;
 
-        /** List of Clients that are awaiting this Terminal State update */
+        /** List of Clients that are awaiting this Terminal State update (clients who needs to be notificated) */
         protected List<Client> _clientObservers = new ArrayList<>();
 
         /** List of communications started by this Terminal */
@@ -57,7 +57,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         protected Map<String, Terminal> _friends = new TreeMap<>();
 
         /**
-         * 
+         *
          * @param key Terinal identifying key
          * @param owner Terminal's Client owner
          */
@@ -75,7 +75,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         /**
          * Returns Terminal's identifying key
-         * 
+         *
          * @return Terminal key
          */
         public String getKey() { return _key; }
@@ -88,14 +88,14 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         /**
          * Returns Terminal's total paid balance in Communication's prices
-         * 
+         *
          * @return paid balance
          */
         public Double getPaidBalance() { return _paidBalance; }
 
         /**
          * Returns Terminal's total debt balance in Communication's prices
-         * 
+         *
          * @return debt balance
          */
         public Double getDebtBalance() { return _debtBalance; }
@@ -106,7 +106,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         /**
          * Returns current Terminal's state
-         * 
+         *
          * @return Terminal's state
          */
         public TerminalState getState() { return _state; }
@@ -118,28 +118,28 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         }
 
         public void setTerminalStateBeforeBusy(TerminalState state) {
-             _stateBeforeBusy = state; 
+             _stateBeforeBusy = state;
         }
 
         public void setTerminalState(TerminalState state) { _state = state; }
 
         /**
          * Returns a List of all Communications started by Terminal
-         * 
+         *
          * @return List of Communications started by this Terminal
          */
         public List<Communication> getStartedCommunications() { return _sentCommunications; }
 
         /**
          * Returns a List of all Communications received by Terminal
-         * 
+         *
          * @return List of Communications received by Terminal
          */
         public List<Communication> getReceivedCommunications() { return _receivedCommunications; }
 
         public List<Client> getClientsObserver() { return _clientObservers; }
 
-        public Communication getUnpaidCommunicationById(Integer id) 
+        public Communication getUnpaidCommunicationById(Integer id)
                                             throws InvalidCommunicationPayment {
 			for(Communication c : _sentCommunications) {
 				if(c.getNumber().equals(id)) {
@@ -166,7 +166,8 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             return _activeCommunication;
         }
 
-        public void addFriend(String key, Network context) 
+
+        public void addFriend(String key, Network context)
                                     throws prr.exceptions.UnknownTerminalKeyException {
             Terminal t = context.getTerminalByKey(key);
 
@@ -186,35 +187,35 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         }
 
         /**
-         * 
+         *
          * @param key Key of Terminal to be removed from Terminals Friends
          * @param context The network context
          * @throws prr.exceptions.UnknownTerminalKeyException If Terminal with
          *                                                    specified key doesn't exist
          */
-        public void removeFriend(String key, Network context) 
+        public void removeFriend(String key, Network context)
                                         throws prr.exceptions.UnknownTerminalKeyException {
             Terminal t = context.getTerminalByKey(key);
-            
+
             // if trying to remove same Terminal from its friends list
             if(key.equals(_key)) {
                 return;
             }
 
-            // if Terminal is not a friend 
+            // if Terminal is not a friend
             if(!isFriend(t)) {
                 return;
             }
 
-            // remove Terminal from friends 
+            // remove Terminal from friends
             _friends.remove(t.getKey());
             // remove this Terminal from other Terminal friends
             // t.getFriends().remove(_key);
         }
 
         /**
-         * Returns True if Terminal with given key is a 
-         * friend 
+         * Returns True if Terminal with given key is a
+         * friend
          *
          * @param key Terminal's key
          *
@@ -225,8 +226,14 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             return _friends.containsKey(terminal.getKey());
         }
 
+		public void doNotify(String notificationType, String terminalKey){
+			for(Client c : _clientObservers){
+				c.getNotificationMethod().deliverNotifications(notificationType, terminalKey);
+			}
+		}
 
-        public void changeTerminalState(TerminalState state, Network context) throws 
+
+        public void changeTerminalState(TerminalState state, Network context) throws
                                                         SameTerminalStateException {
             // check for same Terminal Type and throw exception if same
             if(_state.isSameType(state)) {
@@ -261,21 +268,21 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         /**
          * True if Terminal can receive a text communication, that is
          * if it isn't off or busy (with an active communication)
-         *  
+         *
          * @return true if Terminal can receive a text communication
          */
         public boolean canReceiveTextCommunication() {
             return _state.canReceiveTextCommunication();
         }
 
-        public abstract boolean canReceiveInteractiveCommunication(String commType) 
+        public abstract boolean canReceiveInteractiveCommunication(String commType)
                     throws UnsupportedOperationException;
 
 
         public abstract void sendTextCommunication(String key, String text, Network context)
                     throws UnavailableTerminalException, prr.exceptions.UnknownTerminalKeyException;
 
-        public abstract void sendInteractiveCommunication(String key, String commType, Network context) 
+        public abstract void sendInteractiveCommunication(String key, String commType, Network context)
                     throws UnavailableTerminalException, prr.exceptions.UnknownTerminalKeyException,
                         prr.exceptions.UnsupportedOperationException;
 
@@ -288,7 +295,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
             // get price to return
             Double price = _activeCommunication.getPrice();
-            
+
             // set communication as finished and remove references in sender and receiver terminal
             _activeCommunication.setFinished();
 
@@ -301,7 +308,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             return (int) Math.round(price);
         }
 
-        public void payCommunication(Integer idComm, Network context) 
+        public void payCommunication(Integer idComm, Network context)
                                         throws InvalidCommunicationPayment {
 			Communication c = getUnpaidCommunicationById(idComm);
             _debtBalance -= c.getPrice();
@@ -314,13 +321,13 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         /**
          * Returns String representation of the Terminal
-         * 
+         *
          * Formats:
          * <p>
          * {@code type|terminal-key|owner-key|state|debt|paid}
          * <p>
          * {@code type|terminal-key|owner-key|state|debt|paid|friend1,friend2,...,friendN}
-         * 
+         *
          * @see java.lang.Object#toString()
          */
         @Override

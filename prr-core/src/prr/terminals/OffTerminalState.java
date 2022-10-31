@@ -9,7 +9,7 @@ public class OffTerminalState extends TerminalState implements Serializable {
     @Serial
     /** Serial number for serialization. */
 	private static final long serialVersionUID = 202208091753L;
-    
+
     /** @see prr.terminals.TerminalState#canEndCurrentCommunication(Terminal) */
     @Override
     public boolean canEndCurrentCommunication(Terminal context) {
@@ -50,6 +50,12 @@ public class OffTerminalState extends TerminalState implements Serializable {
 
     @Override
     public void changeTerminalState(Terminal context, TerminalState state) {
+		if(state.isIdle()){
+			context.doNotify("O2I", context.getKey());
+		}
+		else{
+			context.doNotify("O2S", context.getKey());
+		}
         context.setTerminalState(state);
     }
 

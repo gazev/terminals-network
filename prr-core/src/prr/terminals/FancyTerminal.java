@@ -23,13 +23,15 @@ public class FancyTerminal extends BasicTerminal {
 
     @Override
     public void sendInteractiveCommunication(String key, String commType, Network context)
-                                        throws UnavailableTerminalException, 
+                                        throws UnavailableTerminalException,
                                             UnknownTerminalKeyException,
                                                 prr.exceptions.UnsupportedOperationException {
         Terminal destination = context.getTerminalByKey(key);
 
         if(!destination.canReceiveInteractiveCommunication(commType)) {
-            destination.getClientsObserver().add(_owner);
+			if(_owner.notificationsOn()){
+				destination.getClientsObserver().add(_owner);
+			}
             throw new UnavailableTerminalException(destination.getKey(), destination.getState());
         }
 
@@ -43,8 +45,8 @@ public class FancyTerminal extends BasicTerminal {
         context.setDirty();
     }
 
-    /** 
-     * @see prr.terminals.Terminal#toString() 
+    /**
+     * @see prr.terminals.Terminal#toString()
      */
     @Override
     public String toString() {
