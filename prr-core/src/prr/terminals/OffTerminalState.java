@@ -50,7 +50,7 @@ public class OffTerminalState extends TerminalState implements Serializable {
 
     @Override
     public void changeTerminalState(Terminal context, TerminalState state) {
-        // when changing from Off notify Clients awaiting
+        context.setTerminalState(state);
     }
 
 }

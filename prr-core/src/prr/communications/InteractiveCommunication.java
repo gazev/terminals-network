@@ -30,7 +30,7 @@ public abstract class InteractiveCommunication extends Communication {
         _receiver.setTerminalStateBeforeBusy(_receiver.getState());
         // set endpoints states to busy
         _sender.getState().changeTerminalState(_sender, new BusyTerminalState());
-        _receiver.getState().changeTerminalState(_sender, new BusyTerminalState());
+        _receiver.getState().changeTerminalState(_receiver, new BusyTerminalState());
     }
 
     /**

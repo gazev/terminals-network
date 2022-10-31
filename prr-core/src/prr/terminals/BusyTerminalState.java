@@ -41,9 +41,8 @@ public class BusyTerminalState extends TerminalState implements Serializable {
 
     @Override
     public void changeTerminalState(Terminal context, TerminalState state) {
-        // when changing from Busy notify Clients awaiting for this Terminal 
-        return;
-    }
+        context.setTerminalState(state);
+   }
 
     public boolean SameType(BusyTerminalState s) {
         return true;
