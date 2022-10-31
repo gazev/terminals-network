@@ -41,7 +41,7 @@ public class BusyTerminalState extends TerminalState implements Serializable {
 
     @Override
     public void changeTerminalState(Terminal context, TerminalState state) {
-        // terminal state cannot be changed if it is busy (only on end of a communication)
+        // when changing from Busy notify Clients awaiting for this Terminal 
         return;
     }
 
@@ -53,6 +53,16 @@ public class BusyTerminalState extends TerminalState implements Serializable {
     @Override
     public String toString() {
         return "BUSY";
+    }
+
+    @Override
+    public boolean isSameType(TerminalState state) {
+        return state.isBusy();
+    }
+
+    @Override
+    public boolean isBusy() {
+        return true;
     }
 
 }

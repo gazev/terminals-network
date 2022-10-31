@@ -182,7 +182,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             // add to friends list
             _friends.put(t.getKey(), t);
             // add this Terminal to other Terminal's friend list
-            t.getFriends().put(_key, this);
+            // t.getFriends().put(_key, this);
         }
 
         /**
@@ -209,7 +209,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
             // remove Terminal from friends 
             _friends.remove(t.getKey());
             // remove this Terminal from other Terminal friends
-            t.getFriends().remove(_key);
+            // t.getFriends().remove(_key);
         }
 
         /**
@@ -228,8 +228,11 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         public void changeTerminalState(TerminalState state, Network context) throws 
                                                         SameTerminalStateException {
-            _state.SameType(state);
-            
+            // check for same Terminal Type and throw exception if same
+            if(_state.isSameType(state)) {
+                throw new SameTerminalStateException();
+            }
+
             // set Network data as dirty
             context.setDirty();
 

@@ -3,6 +3,8 @@ package prr.terminals;
 import java.io.Serial;
 import java.io.Serializable;
 
+import prr.exceptions.SameTerminalStateException;
+
 public class SilentTerminalState extends TerminalState implements Serializable {
     @Serial
     /** Serial number for serialization. */
@@ -30,13 +32,23 @@ public class SilentTerminalState extends TerminalState implements Serializable {
         return false;
     }
 
-    public boolean SameType(SilentTerminalState s) {
-        return true;
+    public boolean SameType(SilentTerminalState s) throws SameTerminalStateException {
+        throw new SameTerminalStateException();
     }
 
     /** @see java.lang.Object#toString() */
     @Override
     public String toString() {
         return "SILENCE";
+    }
+
+    @Override
+    public boolean isSameType(TerminalState state) {
+        return state.isSilent();
+    }
+
+    @Override
+    public boolean isSilent() {
+        return true;
     }
 }

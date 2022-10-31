@@ -30,7 +30,7 @@ public class FancyTerminal extends BasicTerminal {
 
         if(!destination.canReceiveInteractiveCommunication(commType)) {
             destination.getClientsObserver().add(_owner);
-            throw new UnavailableTerminalException(destination.getKey(), destination.getState().toString());
+            throw new UnavailableTerminalException(destination.getKey(), destination.getState());
         }
 
         // create communication

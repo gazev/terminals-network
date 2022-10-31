@@ -27,16 +27,17 @@ class DoStartInteractiveCommunication extends TerminalCommand {
 		} catch (prr.exceptions.UnknownTerminalKeyException utke) {
 			throw new UnknownTerminalKeyException(utke.getKey());
 		} catch (prr.exceptions.UnavailableTerminalException ute) {
-			_display.popup(switch(ute.getState()) {
-				case "OFF"  -> Message.destinationIsOff(ute.getKey());
-				case "BUSY" -> Message.destinationIsBusy(ute.getKey());
-				default     -> Message.destinationIsSilent(ute.getKey());
-			});
+			if(ute.getState().isBusy()) 
+				_display.popup(Message.destinationIsBusy(ute.getKey()));
+			else if(ute.getState().isSilent()) 
+				_display.popup(Message.destinationIsSilent(ute.getKey()));
+			else 
+				_display.popup(Message.destinationIsOff(ute.getKey()));
 		} catch (prr.exceptions.UnsupportedOperationException uoe) {
-			if(_receiver.getKey().equals(uoe.getKey())) {
-				_display.popup(Message.unsupportedAtOrigin(_receiver.getKey(), stringField("commType")));
+			if(stringField("key").equals(uoe.getKey())) {
+				_display.popup(Message.unsupportedAtDestination(uoe.getKey(), stringField("commType")));
 			} else
-				_display.popup(Message.unsupportedAtDestination(stringField("key"), stringField("commType")));
+				_display.popup(Message.unsupportedAtOrigin(uoe.getKey(), stringField("commType")));
 		}
 	}
 }

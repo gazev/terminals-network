@@ -28,9 +28,9 @@ public abstract class InteractiveCommunication extends Communication {
         // save endpoints states
         _sender.setTerminalStateBeforeBusy(_sender.getState());
         _receiver.setTerminalStateBeforeBusy(_receiver.getState());
-        // set endpoints states
-        _sender.setTerminalState(new BusyTerminalState());
-        _receiver.setTerminalState(new BusyTerminalState());
+        // set endpoints states to busy
+        _sender.getState().changeTerminalState(_sender, new BusyTerminalState());
+        _receiver.getState().changeTerminalState(_sender, new BusyTerminalState());
     }
 
     /**
@@ -42,8 +42,8 @@ public abstract class InteractiveCommunication extends Communication {
         _sender.setActiveCommunication(null);
         _receiver.setActiveCommunication(null);
         // restore Terminals' previous states
-        _sender.setTerminalState(_sender.getStateBeforeBusy());
-        _receiver.setTerminalState(_receiver.getStateBeforeBusy());
+        _sender.getState().changeTerminalState(_sender, _sender.getStateBeforeBusy());
+        _receiver.getState().changeTerminalState(_receiver, _receiver.getStateBeforeBusy());
     }
 
     /**
