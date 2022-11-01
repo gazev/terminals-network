@@ -3,7 +3,6 @@ package prr.terminals;
 import java.io.Serial;
 import java.io.Serializable;
 
-import prr.exceptions.SameTerminalStateException;
 
 public class SilentTerminalState extends TerminalState implements Serializable {
     @Serial
@@ -22,42 +21,43 @@ public class SilentTerminalState extends TerminalState implements Serializable {
         return true;
     }
 
+    /** @see prr.terminals.TerminalState#canReceiveTextCommunication() */
     @Override
     public boolean canReceiveTextCommunication() {
         return true;
     }
 
+    /** @see prr.terminals.TerminalState#canReceiveInteractiveCommunication() */
     @Override
     public boolean canReceiveInteractiveCommunication() {
         return false;
     }
 
-    public boolean SameType(SilentTerminalState s) throws SameTerminalStateException {
-        throw new SameTerminalStateException();
-    }
-
-    /** @see java.lang.Object#toString() */
-    @Override
-    public String toString() {
-        return "SILENCE";
-    }
-
+    /** @see prr.terminals.TerminalState#isSameType(TerminalState) */
     @Override
     public boolean isSameType(TerminalState state) {
         return state.isSilent();
     }
 
+    /** @see prr.terminals.TerminalState#isSilent() */
     @Override
     public boolean isSilent() {
         return true;
     }
 
+    /** @see prr.terminals.Terminal#changeTerminalState(TerminalState, prr.Network) */
 	@Override
     public void changeTerminalState(Terminal context, TerminalState state) {
+        // notify Client observers of State change
 		if(state.isIdle()){
 			context.doNotify("S2I", context.getKey());
 		}
         context.setTerminalState(state);
    }
 
+    /** @see java.lang.Object#toString() */
+    @Override
+    public String toString() {
+        return "SILENCE";
+    }
 }

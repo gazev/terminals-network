@@ -21,6 +21,7 @@ public abstract class TerminalState {
 
     
     public abstract boolean canReceiveTextCommunication();
+
     public abstract boolean canReceiveInteractiveCommunication();
 
     public void changeTerminalState(Terminal context, TerminalState state) {
@@ -28,16 +29,19 @@ public abstract class TerminalState {
     }
 
     /**
-     * Checks if given state is of the same type
+     * Checks if given State is of the same type
      * 
      * @param state Terminal state to be checked against
      * @return True if given State is the same as this State
      */
-    public abstract boolean isSameType(TerminalState state); 
+    public abstract boolean isSameType(TerminalState state);
 
-    /** Fallback functions, each type implements its own */
+    /** Fallback functions, each State implements its own */
     public boolean isSilent() { return false; }
+    /** Fallback functions, each State implements its own */
     public boolean isOff() { return false; }
+    /** Fallback functions, each State implements its own */
     public boolean isBusy() { return false; }
+    /** Fallback functions, each State implements its own */
     public boolean isIdle() { return false; }
 }

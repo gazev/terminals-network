@@ -37,6 +37,9 @@ public class Client implements Serializable {
     private Map<String, Terminal> _terminals = new TreeMap<>();
 
     /** Client's notifications not yet delivered */
+    private Queue<Notification> _unhandledNotificationsLog = new LinkedList<>();
+
+    /** A log of all Client notifications */
     private Queue<Notification> _notificationsLog = new LinkedList<>();
 
     /** Flag to determine if Client should be notified */
@@ -47,29 +50,46 @@ public class Client implements Serializable {
 
     /** Notification method, initialized with default NotificationMethod */
     NotificationMethod _notificationMethod = new NotificationMethod() {
-
+        /* The default notification method does not perform any relevant action,
+         * it only registers the notification in a log of notifications that were
+         * not attended at the time of their occurence 
+         * and will be displayed once a user is visualized 
+         */
         @Serial
         /** Serial number for serialization. */
 	    private static final long serialVersionUID = 202208091753L;
 
-        /** The default Notification Method currently does not perform any relevant action */
-        public void deliverNotifications(String notificationType, String terminalKey) {
-			Notification n = new Notification(terminalKey, notificationType);
-			_notificationsLog.add(n);
+        @Override
+        /** The default notification method simply registers a Notification that was unhandled */
+        public void deliverNotification(Notification n) {
+			_unhandledNotificationsLog.add(n);
         }
     };
 
     /** Notificaitons that Clients receive */
     public class Notification {
+        /** ID of the Terminal that originated the Notification */
 		private String _terminalSenderKey;
 
+        /** String that describes the Type of Notification
+         * <p>
+         * O2I: Off-to-Silent
+         * <p>
+         * O2S: Off-to-Silent
+         * <p>
+         * B2I: Busy-to-Idle
+         * <p>
+         * S2I: Silent-to-Idle
+         */
 		private String _notificationType;
 
         public Notification(String terminalSenderKey, String notificationType) {
 			_terminalSenderKey = terminalSenderKey;
 			_notificationType = notificationType;
+            _notificationsLog.add(this);
 		}
 
+        /** @see java.lang.Object#toString() */
 		public String toString(){
 			return _notificationType + "|" + _terminalSenderKey;
 		}
@@ -121,6 +141,10 @@ public class Client implements Serializable {
         return _type;
     }
 
+    /**
+     * 
+     * @return Client's TariffPlan
+     */
     public TariffPlan getTariffPlan() { return _tariffPlan; }
 
     public Collection<Terminal> getTerminals() {
@@ -143,6 +167,10 @@ public class Client implements Serializable {
         return _terminals.size();
     }
 
+    /**
+     * 
+     * @return The Notification Method of the Client
+     */
 	public NotificationMethod getNotificationMethod(){ return _notificationMethod; }
 
 
@@ -165,7 +193,7 @@ public class Client implements Serializable {
      * Returns this Client's balance paid by checking each of his Terminal's
      * paid balance.
      *
-     * @reutrn Client's paid balance
+     * @return Client's paid balance
      */
     public Double getClientPaidBalance() {
         Double sum = 0.0;
@@ -175,10 +203,25 @@ public class Client implements Serializable {
         return sum;
     }
 
+    /**
+     * Returns the balance of this Client. The balance is defined as the
+     * difference between the Client's paid balance and debt balance
+     * 
+     * @return Client's total balance
+     */
+    public Double getClientBalance() {
+        return getClientPaidBalance() - getClientDebtBalance();
+    }
+
+    /**
+     * Returns Client's unhandled Notifications
+     * 
+     * @return All Client's unhandled Notifications
+     */
 	public Collection<Notification> getUnhandledNotification(){
 		List<Notification> aux = new ArrayList<>();
-		while(!_notificationsLog.isEmpty()){
-			aux.add(_notificationsLog.remove());
+		while(!_unhandledNotificationsLog.isEmpty()){
+			aux.add(_unhandledNotificationsLog.remove());
 		}
 		return aux;
 	}
@@ -204,8 +247,8 @@ public class Client implements Serializable {
     /**
      * Deliver Client notification using current Client's Notification Method
      */
-    public void doNotify() {
-        _notificationMethod.notify();
+    public void notify(Notification n) {
+        _notificationMethod.deliverNotification(n);
     }
 
     /**
@@ -215,6 +258,42 @@ public class Client implements Serializable {
      */
     public void addTerminal(Terminal terminal) {
         _terminals.put(terminal.getKey(), terminal);
+    }
+
+    /**
+     * Performs the required actions on a Client after a payment
+     */
+    public void pay() {
+        _type.pay(this);
+    }
+
+    /**
+     * Performs the required actions on a Client after starting a
+     * communication
+     */
+    public void sendCommunication() {
+        _type.sendCommunication(this);
+    }
+
+    /**
+     * Increments number of consecutive Text Comms of a Client
+     */
+    public void incrementConsecutiveTextComms() {
+        _type.incrementConsecutiveTextComms();
+    }
+
+    /**
+     * Increments number of consecutive Voice Comms of a Client
+     */
+    public void incrementConsecutiveVoiceComms() {
+        _type.incrementConsecutiveVoiceComms();
+    }
+
+    /**
+     * Increments number of consecutive Video Comms of a Client
+     */
+    public void incrementConsecutiveVideoComms() {
+        _type.incrementConsecutiveVideoComms();
     }
 
     /**
@@ -237,7 +316,7 @@ public class Client implements Serializable {
                 _type + "|" +
                 (notificationsOn() ? "YES" : "NO") + "|" +
                 _terminals.size() + "|" +
-                (int) Math.round(getClientDebtBalance()) + "|" +
-                (int) Math.round(getClientPaidBalance());
+                (int) Math.round(getClientPaidBalance()) + "|" +
+                (int) Math.round(getClientDebtBalance());
     }
 }

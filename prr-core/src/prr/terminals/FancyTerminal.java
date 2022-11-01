@@ -7,6 +7,7 @@ import prr.communications.VoiceCommunication;
 import prr.exceptions.UnknownTerminalKeyException;
 import prr.exceptions.UnavailableTerminalException;
 
+/** A Fancy Terminal that performs all types of Communications */
 public class FancyTerminal extends BasicTerminal {
     public FancyTerminal(String key, Client owner) {
         super(key, owner);
@@ -16,11 +17,13 @@ public class FancyTerminal extends BasicTerminal {
         super(key, owner, state);
     }
 
+    /** @see prr.terminals.Terminal#canReceiveInteractiveCommunication(String) */
     @Override
     public boolean canReceiveInteractiveCommunication(String commType) {
         return _state.canReceiveInteractiveCommunication();
     }
 
+    /** @see prr.terminals.Terminal#sendInteractiveCommunication(String, String, Network) */
     @Override
     public void sendInteractiveCommunication(String key, String commType, Network context)
                                         throws UnavailableTerminalException,
@@ -29,8 +32,9 @@ public class FancyTerminal extends BasicTerminal {
         Terminal destination = context.getTerminalByKey(key);
 
         if(!destination.canReceiveInteractiveCommunication(commType)) {
-			if(_owner.notificationsOn()){
+			if(_owner.notificationsOn() && !destination.getClientsObserver().contains(_owner)){
 				destination.getClientsObserver().add(_owner);
+                context.setDirty();
 			}
             throw new UnavailableTerminalException(destination.getKey(), destination.getState());
         }
@@ -38,9 +42,13 @@ public class FancyTerminal extends BasicTerminal {
         // create communication
         if(commType.equals("VOICE")) {
             new VoiceCommunication(this, destination);
+            _owner.incrementConsecutiveVoiceComms();
         } else {
             new VideoCommunication(this, destination);
+            _owner.incrementConsecutiveVideoComms();
         }
+        _owner.sendCommunication();
+
         // set context dirty
         context.setDirty();
     }

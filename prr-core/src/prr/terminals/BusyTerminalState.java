@@ -16,12 +16,9 @@ public class BusyTerminalState extends TerminalState implements Serializable {
         try {
             return context.getActiveCommunication().getSender().equals(context);
         } catch (NoActiveCommunicationException e) {
-            // never happens
             return false;
         }
     }
-
-    // TODO
 
     /** @see prr.terminals.TerminalState#canStartCommunication(Terminal) */
     @Override
@@ -29,16 +26,19 @@ public class BusyTerminalState extends TerminalState implements Serializable {
         return false;
     }
 
+    /** @see prr.terminals.TerminalState#canReceiveTextCommunication() */
     @Override
     public boolean canReceiveTextCommunication() {
         return true;
     }
 
+    /** @see prr.terminals.TerminalState#canReceiveInteractiveCommunication() */
     @Override
     public boolean canReceiveInteractiveCommunication() {
         return false;
     }
 
+    /** @see prr.terminals.TerminalState#changeTerminalState(Terminal, TerminalState) */
     @Override
     public void changeTerminalState(Terminal context, TerminalState state) {
 		if(state.isIdle()){
@@ -47,7 +47,15 @@ public class BusyTerminalState extends TerminalState implements Serializable {
         context.setTerminalState(state);
    }
 
-    public boolean SameType(BusyTerminalState s) {
+    /** @see prr.terminals.TerminalState#isSameType(TerminalState) */
+    @Override
+    public boolean isSameType(TerminalState state) {
+        return state.isBusy();
+    }
+
+    /** @see prr.terminals.TerminalState#isBusy() */
+    @Override
+    public boolean isBusy() {
         return true;
     }
 
@@ -56,15 +64,4 @@ public class BusyTerminalState extends TerminalState implements Serializable {
     public String toString() {
         return "BUSY";
     }
-
-    @Override
-    public boolean isSameType(TerminalState state) {
-        return state.isBusy();
-    }
-
-    @Override
-    public boolean isBusy() {
-        return true;
-    }
-
 }

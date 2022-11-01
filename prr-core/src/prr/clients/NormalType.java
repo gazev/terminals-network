@@ -12,10 +12,17 @@ public class NormalType extends ClientType implements Serializable {
         _tariffTable = context.getTariffPlan().getNormalTable();
     }
 
+    /** @see prr.clients.ClientType#pay(Client) */
+    @Override
+    public void pay(Client context) {
+        if(context.getClientBalance() > 500) {
+            changeClientType(new GoldType(context), context);
+        }
+    }
+
     /** @see java.lang.Object#toString() */
     @Override
     public String toString() {
         return "NORMAL";
     }
-    
 }

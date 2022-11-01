@@ -10,8 +10,6 @@ public abstract class NotificationMethod implements Serializable {
     /** Serial number for serialization. */
 	private static final long serialVersionUID = 202208091753L;
 
-
-    public void deliverNotifications(String _notificationType, String _terminalKey) {
-        // EMPTY
-    };
+    /** Delivers the Notification to the Client */
+    public abstract void deliverNotification(Client.Notification n);
 }

@@ -3,8 +3,6 @@ package prr.terminals;
 import java.io.Serial;
 import java.io.Serializable;
 
-import prr.exceptions.SameTerminalStateException;
-
 public class OnTerminalState extends TerminalState implements Serializable {
     @Serial
     /** Serial number for serialization. */
@@ -22,18 +20,28 @@ public class OnTerminalState extends TerminalState implements Serializable {
         return true;
     }
 
+    /** @see prr.terminals.TerminalState#canReceiveTextCommunication() */
     @Override
     public boolean canReceiveTextCommunication() {
         return true;
     }
 
+    /** @see prr.terminals.TerminalState#canReceiveInteractiveCommunication() */
     @Override
     public boolean canReceiveInteractiveCommunication() {
         return true;
     }
 
-    public boolean SameType(OnTerminalState s) throws SameTerminalStateException {
-        throw new SameTerminalStateException();
+    /** @see prr.terminals.TerminalState#isSameType(TerminalState) */
+    @Override
+    public boolean isSameType(TerminalState s) {
+        return s.isIdle();
+    }
+
+    /** @see prr.terminals.TerminalState#isIdle() */
+    @Override
+    public boolean isIdle() { 
+        return true;
     }
 
     /** @see java.lang.Object#toString() */
@@ -42,14 +50,5 @@ public class OnTerminalState extends TerminalState implements Serializable {
         return "IDLE";
     }
 
-    @Override
-    public boolean isSameType(TerminalState state) {
-        return state.isIdle();
-    }
-
-    @Override
-    public boolean isIdle() { 
-        return true;
-    }
 
 }

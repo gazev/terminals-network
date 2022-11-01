@@ -1,4 +1,4 @@
-CLASSPATH :=../po-uilib/po-uilib.jar:./prr-app/prr-app.jar:./prr-core/prr-core.jar
+CLASSPATH :=/usr/share/java/po-uilib.jar:./prr-app/prr-app.jar:./prr-core/prr-core.jar
 
 .PHONY = all clean install run test docs
 
@@ -17,7 +17,7 @@ test:
 	@./runtests.sh $(CLASSPATH) tests
 
 docs:
-	$(shell javadoc -d docs -sourcepath prr-core/src:prr-app/src:../po-uilib/src -subpackages prr:pt.tecnico.uilib)
+	$(shell javadoc -d docs -sourcepath prr-core/src:prr-app/src -subpackages prr:prr.app)
 
 clean:
 	(cd prr-core; make $(MFLAGS) clean)

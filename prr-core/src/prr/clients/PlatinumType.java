@@ -12,6 +12,15 @@ public class PlatinumType extends ClientType implements Serializable {
         _tariffTable = context.getTariffPlan().getPlatinumTable(); 
     }
     
+    /** @see prr.clients.ClientType#sendCommunication(Client) */
+    @Override
+    public void sendCommunication(Client context) {
+        if(_consecutiveTextComms.equals(2) && context.getClientBalance() > 0)
+            changeClientType(new GoldType(context), context);
+        if(context.getClientBalance() < 0)
+            changeClientType(new NormalType(context), context);
+    }
+    
     /** @see java.lang.Object#toString() */
     @Override
     public String toString() {
